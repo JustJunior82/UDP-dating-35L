@@ -1,0 +1,21 @@
+@import url('https://fonts.google.com/specimen/Ubuntu+Mono');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+header {
+    position: fixed;   
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 100px;
+    transition: 0.6s;
+    background-color: greenyellow;
+}
