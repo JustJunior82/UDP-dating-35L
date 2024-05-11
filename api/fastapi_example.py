@@ -5,14 +5,21 @@ import uvicorn
 from dotenv import load_dotenv
 from email_validator import validate_email, EmailNotValidError
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+
+SUCCESS = 0
+INVALID_EMAIL = 1
+DUPLICATE_USER_OR_EMAIL = 2
+FAILED_MONGODB_ACTION = 3
 
 load_dotenv()
 
 app = FastAPI()
 uri = os.getenv("MONGODB_URI")
-assert uri is not None # TODO: better error handling
+if uri is None:
+    raise Exception("Environment variable MONGODB_URI is not set. Ask for .env file!")
 
 # Create a new client and connect to the server
 mongo_client = MongoClient(uri, server_api=ServerApi('1'))
@@ -22,20 +29,21 @@ try:
     mongo_client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
-    print(e)
+    raise Exception("Failed to connect to MongoDB. Likely, environment variable MONGODB_URI is not set. Ask for .env file!") from e
 
 @app.get("/say_hi")
 async def hi(my_field:str):
 	return f"hi {my_field}!"
 
 @app.post("/register")
-async def register(username: str, password: str, email: str): # TODO: use meaningful return values
+async def register(username: str, password: str, email: str) -> JSONResponse:
     try:
         email_info = validate_email(email, check_deliverability=True)
         email = email_info.normalized
     except EmailNotValidError as exc:
+        print("Email not valid: exception below")
         print(exc)
-        return 1
+        return JSONResponse({"error": INVALID_EMAIL})
     
     hasher = hashlib.new("sha256")
     hasher.update(password.encode())
@@ -44,9 +52,14 @@ async def register(username: str, password: str, email: str): # TODO: use meanin
     users = mongo_client["UDPDating"]["Users"]
     if users.find_one({"$or": [{"user": username}, {"email": email}]}) is not None:
         print("Duplicate user or email")
-        return 2
-    users.insert_one({"user": username, "email": email, "passhex": passhex})
-    return 0
+        return JSONResponse({"error": DUPLICATE_USER_OR_EMAIL})
+    try:
+        users.insert_one({"user": username, "email": email, "passhex": passhex})
+    except Exception as e:
+        print("Unknown error: exception below")
+        print(e)
+        return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    return JSONResponse({"error": SUCCESS})
 
 uvicorn.run(app, port=12345, host="0.0.0.0")
 
