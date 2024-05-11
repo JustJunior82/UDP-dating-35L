@@ -1,18 +1,26 @@
+import datetime
 import hashlib
 import os
+import uuid
 
 import uvicorn
 from dotenv import load_dotenv
 from email_validator import validate_email, EmailNotValidError
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
+# Error codes
 SUCCESS = 0
 INVALID_EMAIL = 1
 DUPLICATE_USER_OR_EMAIL = 2
 FAILED_MONGODB_ACTION = 3
+WRONG_USER_OR_PASS = 4
+
+# Application constants
+SESSION_TIMEOUT = datetime.timedelta(hours=1)
 
 load_dotenv()
 
@@ -60,6 +68,37 @@ async def register(username: str, password: str, email: str) -> JSONResponse:
         print(e)
         return JSONResponse({"error": FAILED_MONGODB_ACTION})
     return JSONResponse({"error": SUCCESS})
+
+@app.post("/api/login")
+async def login(username: str, password: str) -> JSONResponse:
+    hasher = hashlib.new("sha256")
+    hasher.update(password.encode())
+    passhex = hasher.hexdigest()
+
+    users = mongo_client["UDPDating"]["Users"]
+    if users.find_one({"$and": [{"user": username}, {"passhex": passhex}]}) is None:
+        return JSONResponse({"error": WRONG_USER_OR_PASS}, status_code=401)
+
+    access_token = str(uuid.uuid4())
+    now = datetime.datetime.now()
+    sessions = mongo_client["UDPDating"]["Sessions"]
+    try:
+        if sessions.find_one({"user": username}) is None:
+            sessions.insert_one({"user": username, "access-token": access_token, "created": now.timestamp()})
+        else:
+            sessions.update_one({"user": username}, {"$set": {"access-token": access_token, "created": now.timestamp()}})
+    except Exception as e:
+        print("Unknown error: exception below")
+        print(e)
+        return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    
+    return JSONResponse(jsonable_encoder({
+        "error": SUCCESS, 
+        "content": {
+            "access-token": access_token,
+            "expired": (now + SESSION_TIMEOUT).timestamp()
+        }
+    }))
 
 uvicorn.run(app, port=12345, host="0.0.0.0")
 
