@@ -31,11 +31,11 @@ try:
 except Exception as e:
     raise Exception("Failed to connect to MongoDB. Likely, environment variable MONGODB_URI is not set. Ask for .env file!") from e
 
-@app.get("/say_hi")
+@app.get("/api/say_hi")
 async def hi(my_field:str):
 	return f"hi {my_field}!"
 
-@app.post("/register")
+@app.post("/api/register")
 async def register(username: str, password: str, email: str) -> JSONResponse:
     try:
         email_info = validate_email(email, check_deliverability=True)
