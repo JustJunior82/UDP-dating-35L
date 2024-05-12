@@ -22,8 +22,27 @@ Register a user.
 
 Response body:
 
-error:
-- 0 => success
-- 1 => invalid email
-- 2 => invalid user
-- 3 => failed to insert into database
+### Login
+POST
+`/api/login?username={username}&password={password}`
+
+Login an existing user.
+
+Response body:
+
+If successful,
+access-token: Generated access token.
+expired: POSIX timestamp indicating when access token expires.
+
+### Token regeneration
+POST
+`/api/regenerate_token?username={username}&access_token={access_token}`
+
+Attempt to regenerate a token given a username and previous issued access
+token.
+
+Response body:
+
+If successful,
+access-token: New access token,
+expired: POSIX timestamp indicating when new access token expires.
