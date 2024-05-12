@@ -35,7 +35,7 @@ access-token: Generated access token.
 expired: POSIX timestamp indicating when access token expires.
 
 ### Token regeneration
-POST
+PUT
 `/api/regenerate_token?username={username}&access_token={access_token}`
 
 Attempt to regenerate a token given a username and previous issued access
