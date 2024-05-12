@@ -134,6 +134,22 @@ async def regenerate_token(username: str, access_token: str) -> JSONResponse:
         }
     }))
 
+@app.get("/api/validate_token")
+async def validate_token(username: str, access_token: str) -> JSONResponse:
+    now = datetime.datetime.now()
+    sessions = mongo_client["UDPDating"]["Sessions"]
+    try:
+        session_document = sessions.find_one({"$and": [{"user": username}, {"access-token": access_token}]})
+        if session_document is None:
+            return JSONResponse({"error": WRONG_USER_OR_ACCESS_TOKEN}, status_code=401)
+        elif now > datetime.datetime.fromtimestamp(session_document["created"]) + SESSION_TIMEOUT_DURATION:
+            return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+    except Exception as e:
+        print("Unknown error: exception below")
+        print(e)
+        return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    return JSONResponse({"error": SUCCESS})
+
 uvicorn.run(app, port=12345, host="0.0.0.0")
 
 '''
