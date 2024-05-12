@@ -18,9 +18,11 @@ INVALID_EMAIL = 1
 DUPLICATE_USER_OR_EMAIL = 2
 FAILED_MONGODB_ACTION = 3
 WRONG_USER_OR_PASS = 4
+SESSION_TIMED_OUT = 5
+WRONG_USER_OR_ACCESS_TOKEN = 6
 
 # Application constants
-SESSION_TIMEOUT = datetime.timedelta(hours=1)
+SESSION_TIMEOUT_DURATION = datetime.timedelta(hours=1)
 
 load_dotenv()
 
@@ -38,6 +40,10 @@ try:
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     raise Exception("Failed to connect to MongoDB. Likely, environment variable MONGODB_URI is not set. Ask for .env file!") from e
+
+def generate_access_token() -> str:
+    """Utility function for generating an access token."""
+    return str(uuid.uuid4())
 
 @app.get("/api/say_hi")
 async def hi(my_field:str):
@@ -79,7 +85,7 @@ async def login(username: str, password: str) -> JSONResponse:
     if users.find_one({"$and": [{"user": username}, {"passhex": passhex}]}) is None:
         return JSONResponse({"error": WRONG_USER_OR_PASS}, status_code=401)
 
-    access_token = str(uuid.uuid4())
+    access_token = generate_access_token()
     now = datetime.datetime.now()
     sessions = mongo_client["UDPDating"]["Sessions"]
     try:
@@ -96,7 +102,35 @@ async def login(username: str, password: str) -> JSONResponse:
         "error": SUCCESS, 
         "content": {
             "access-token": access_token,
-            "expired": (now + SESSION_TIMEOUT).timestamp()
+            "expired": (now + SESSION_TIMEOUT_DURATION).timestamp()
+        }
+    }))
+
+@app.put("/api/regenerate_token")
+async def regenerate_token(username: str, access_token: str) -> JSONResponse:
+    now = datetime.datetime.now()
+    sessions = mongo_client["UDPDating"]["Sessions"]
+    new_token = generate_access_token()
+    try:
+        session_document = sessions.find_one({"$and": [{"user": username}, {"access-token": access_token}]})
+        if session_document is None:
+            return JSONResponse({"error": WRONG_USER_OR_ACCESS_TOKEN}, status_code=401)
+        elif now > datetime.datetime.fromtimestamp(session_document["created"]) + SESSION_TIMEOUT_DURATION:
+            return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+        else:
+            sessions.update_one(
+                {"$and": [{"user": username}, {"access-token": access_token}]},
+                {"$set": {"access-token": new_token, "created": now.timestamp()}}
+            )
+    except Exception as e:
+        print("Unknown error: exception below")
+        print(e)
+        return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    return JSONResponse(jsonable_encoder({
+        "error": SUCCESS,
+        "content": {
+            "access-token": new_token,
+            "expired": (now + SESSION_TIMEOUT_DURATION).timestamp()
         }
     }))
 
