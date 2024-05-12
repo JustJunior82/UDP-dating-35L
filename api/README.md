@@ -27,3 +27,14 @@ error:
 - 1 => invalid email
 - 2 => invalid user
 - 3 => failed to insert into database
+
+### Image to ASCII conversion
+POST
+`/api/img2ascii?image={filename}`
+
+Convert an image to ASCII. Image should either have Content-Type image/jpeg or
+image/png.
+
+Response body:
+
+content: ASCII
