@@ -46,3 +46,9 @@ Response body:
 If successful,
 access-token: New access token,
 expired: POSIX timestamp indicating when new access token expires.
+
+### Token validation
+GET
+`/api/validate_token?username={username}&access_token={access_token}`
+
+Attempt to validate a token given a username and access token.
