@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "./components/Navbar/index";
+import Navbar from "./components/Navbar/";
 import {
     BrowserRouter as Router,
     Routes,
@@ -14,6 +14,9 @@ import About from "./pages/about";
 import Posts from "./pages/posts";
 import Login from "./pages/login";
 import Contact from "./pages/contact";
+import Profile from "./pages/profile";
+import Settings from "./pages/settings";
+
 // import PrivateRoute from "./pages/PrivateRoute";
 
 
@@ -25,30 +28,22 @@ function App() {
     //     return isLoggedIn ? <Outlet /> : <Navigate to={Login} />;
     // }
 
-    // dummy login function
-    function handleLogin() {
-        setLogin(true);
-    }
-    
     return (
         <Router>
-            <Navbar />
+            <Navbar isLoggedIn={isLoggedIn}/>
             <Routes>
-                <Route exact path="/" element={<Home isAuth={String(isLoggedIn)} onLogIn={() => handleLogin()}/>} />
+                <Route exact path="/" element={<Home isAuth={String(isLoggedIn)} onLogIn={() => setLogin(true)} onLogOut={() => setLogin(false)}/>} />
                 <Route path="/about" element={<About />} />
-                <Route
-                    path="/contact"
-                    element={<Contact />}
-                />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/posts" element={<Posts />} />
-                <Route path="/login" element={<Login />} />
-                {/* <Route path='/' element={<PrivateRoute />}>
-                    <Route path='/' element={<Home isAuth={String(isLoggedIn)} onLogIn={() => handleLogin()}/>}/>
-                </Route> */}
+                <Route path="/login" element={<Login setLogin={() => setLogin(true)}/>} />
+                {/* unaccessable until logged in */}
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
 
             </Routes>
         </Router>
     );
-}
+};
  
 export default App;
