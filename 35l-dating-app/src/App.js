@@ -22,11 +22,15 @@ import Settings from "./pages/settings";
 
 function App() {
     const [isLoggedIn, setLogin] = useState(false);
+    const [userInfo, setUserInfo] = useState({
+        username: "",
+        image: "",
+        preferences: []})
 
-    // let PrivateRoute = () => {
-    //     // outlet renders child elements if user is logged in, else navigate to login page
-    //     return isLoggedIn ? <Outlet /> : <Navigate to={Login} />;
-    // }
+    function handleLogin(props) {
+        setLogin(true);
+        setUserInfo(props);
+    }
 
     return (
         <Router>
@@ -36,9 +40,9 @@ function App() {
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/posts" element={<Posts />} />
-                <Route path="/login" element={<Login setLogin={() => setLogin(true)}/>} />
+                <Route path="/login" element={<Login setLogin={(props) => handleLogin(props)}/>} />
                 {/* unaccessable until logged in */}
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile" element={<Profile props={userInfo}/>} />
                 <Route path="/settings" element={<Settings />} />
 
             </Routes>

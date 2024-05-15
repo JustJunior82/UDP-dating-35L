@@ -1,17 +1,26 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login({ setLogin }) {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+
+    const handleRedirect = () => {
+        navigate("/profile");
+    }
 
     function handleLogin(event) {
         event.preventDefault()
         // Implement API Authentication call
-        let auth = null;
-
+        let auth = true;
+        let userData = { username: "dummy user",  image: "image-url", preferences: ["A", "B", "C"] };
+        
         if (auth) {
-            setLogin();
+            setLogin(userData);
+            // After Login, redirect to Profile Page
+            handleRedirect();
         }
     }
 
