@@ -3,6 +3,9 @@
 ## Setup
 Requires private `.env` variables. Make sure you have `.env`!
 
+Add a file called .env containing the following contents:
+MONGODB_URI=mongodb+srv://ericwangyy:CY14sbFOEloKFNgj@dev-project.almoc1l.mongodb.net/?retryWrites=true&w=majority&appName=dev-project
+
 ## Operations
 
 ### Say hi
