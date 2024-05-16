@@ -34,7 +34,14 @@ def get_mongo_client():
 def search_users(username):
     users_collection = get_mongo_client()["UDPDating"]["Users"]
     users = users_collection.find({"user": {"$regex": username, "$options": "i"}}).limit(10)
-    return [{"user": user["user"], "email": user["email"]} for user in users]
+    return [{"user": user["user"], "email": user["email"], "profile": user.get("profile", {})} for user in users]
+
+#queries for users with profile
+def search_profile(profile_key, profile_val):
+    users_collection = get_mongo_client()["UDPDating"]["Users"]
+    query = {f"profile.{profile_key}": {"$regex": profile_val, "$options": "i"}}
+    users = users_collection.find(query)
+    return [{"user": user["user"], "email": user["email"], "profile": user.get("profile", {})} for user in users]
 
 #returns profile of username, if one exists
 def get_profile(username):
@@ -43,11 +50,21 @@ def get_profile(username):
     return user
 
 #updates new_profile_str that corresponds to username
-def post_profile(username, new_profile_str):
+def post_profile(username, profile_key, new_profile_str):
     users_collection = get_mongo_client()["UDPDating"]["Users"]
     result = users_collection.update_one(
         {"user": username},
-        {"$set": {"profile": new_profile_str}}
+        {"$set": {f"profile.{profile_key}": new_profile_str}}
+    )
+    if result.matched_count == 0:
+        raise Exception("User does not exist")
+
+#removes a profile key if it doesn't exist
+def delete_profile_key(username, profile_key):
+    users_collection = get_mongo_client()["UDPDating"]["Users"]
+    result = users_collection.update_one(
+        {"user": username},
+        {"$unset": {f"profile.{profile_key}": ""}}
     )
     if result.matched_count == 0:
         raise Exception("User does not exist")
