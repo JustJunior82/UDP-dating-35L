@@ -94,5 +94,3 @@ async def register(username: str, password: str, email: str) -> JSONResponse:
     return JSONResponse({"error": SUCCESS})
 
 uvicorn.run(app, port=12345, host="0.0.0.0")
-
-uvicorn.run(app, port=12345, host="0.0.0.0")
