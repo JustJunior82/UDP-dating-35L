@@ -1,7 +1,9 @@
+import ascii_magic
+import PIL.Image
 import uvicorn
 from dotenv import load_dotenv
 from email_validator import validate_email, EmailNotValidError
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
 
 ######## INTERNAL DEPENDENCIES ########
@@ -18,6 +20,10 @@ DUPLICATE_USER_OR_EMAIL = 2
 FAILED_MONGODB_ACTION = 3
 NONEXISTENT_USER = 4
 INVALID_PASSWORD = 5
+UNSUPPORTED_IMAGE_FORMAT = 8
+IMAGE_TOO_LARGE = 9
+FAILED_ASCII_MAGIC_ACTION = 10
+FAILED_PIL_ACTION = 11
 
 app = FastAPI()
 
@@ -92,6 +98,30 @@ async def register(username: str, password: str, email: str) -> JSONResponse:
         print(e)
         return JSONResponse({"error": FAILED_MONGODB_ACTION})
     return JSONResponse({"error": SUCCESS})
+
+@app.post("/api/img2ascii")
+async def img2ascii(image: UploadFile) -> JSONResponse:
+    COLUMNS = 200
+    FILE_SIZE_LIMIT_BYTES = 2000000
+
+    if image.content_type != "image/jpeg" and image.content_type != "image/png":
+        return JSONResponse({"error": UNSUPPORTED_IMAGE_FORMAT}, status_code=422)
+    file_size = len(image.file.read())
+    if file_size > FILE_SIZE_LIMIT_BYTES:
+        return JSONResponse({"error": IMAGE_TOO_LARGE}, status_code=422)
+    image.file.seek(0)
+
+    try:
+        pillow_image = PIL.Image.open(image.file)
+    except Exception:
+        return JSONResponse({"error": FAILED_PIL_ACTION})
+    
+    try:
+        art = ascii_magic.AsciiArt.from_pillow_image(pillow_image)
+    except Exception:
+        return JSONResponse({"error": FAILED_ASCII_MAGIC_ACTION})
+    
+    return JSONResponse({"error": SUCCESS, "content": art.to_ascii(COLUMNS)})
 
 uvicorn.run(app, port=12345, host="0.0.0.0")
 
