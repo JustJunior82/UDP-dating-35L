@@ -68,6 +68,46 @@ Registers a new user.
 **Returns:**
 - A JSON response indicating success or failure (e.g., invalid email, duplicate user or email, failed MongoDB action).
 
+## POST /api/login
+
+Login an existing user and get an access token.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `password` (str): The password for the existing user.
+
+**Returns:**
+- An error code
+- If successful,
+  - access-token: Generated access token.
+  - expired: POSIX timestamp indicating when access token expires.
+
+## PUT /api/regenerate_token
+
+Regenerate a token given a username and previous issued access
+token.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+
+**Returns:**
+- An error code
+- If successful,
+  - access-token: Generated access token.
+  - expired: POSIX timestamp indicating when access token expires.
+
+## GET /api/validate_token
+
+Validate a token given a username and access token.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+
+**Returns:**
+- An error code
+
 ## BUILD ##
 
 Given the right dependencies have been installed, putting the working directory in "api" and executing "python3 main.py" should run the server on port 12345.
