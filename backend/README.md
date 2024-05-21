@@ -68,6 +68,16 @@ Registers a new user.
 **Returns:**
 - A JSON response indicating success or failure (e.g., invalid email, duplicate user or email, failed MongoDB action).
 
+### POST /api/img2ascii
+
+Convert an image to ASCII. Image should either have Content-Type image/jpeg or image/png.
+
+**Parameters:**
+- `image` (str): The filename.
+
+**Returns:**
+- ASCII string
+
 ## BUILD ##
 
 Given the right dependencies have been installed, putting the working directory in "api" and executing "python3 main.py" should run the server on port 12345.
