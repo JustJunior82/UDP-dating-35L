@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from email_validator import validate_email, EmailNotValidError
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 ######## INTERNAL DEPENDENCIES ########
 
@@ -20,6 +21,19 @@ NONEXISTENT_USER = 4
 INVALID_PASSWORD = 5
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:12345",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/search_users")
 async def search_users(username: str):
