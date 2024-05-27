@@ -111,8 +111,5 @@ def get_match_score(my_user: str, their_user: str) -> float:
         score += coeff * value
     return score
 
-def get_match_edge_order(user1: str, user2: str) -> tuple[str, str]:
-    return min(user1, user2), max(user1, user2)
-
 def get_search_limit() -> int:
     return 100

@@ -199,28 +199,34 @@ async def search_potential_matches(username: str, access_token: str, skip: int =
                 return JSONResponse({"error": FAILED_MONGODB_ACTION})
     mongo_client = mongo.get_mongo_client()
     users = mongo_client["UDPDating"]["Users"]
-    user = users.find_one({"user": username})
+    me = users.find_one({"user": username})
 
     # create profile filter
     conditions = {"ide": ide, "os": os, "pl": pl}
     match_filter = collections.defaultdict(list)
     for key, cond in conditions.items():
-        if cond and key in user["profile"]:
-            match_filter["$and"].append({f"profile.{key}": {"$regex": user["profile"][key], "$options": "i"}})
+        if cond and key in me["profile"]:
+            match_filter["$and"].append({f"profile.{key}": {"$regex": me["profile"][key], "$options": "i"}})
 
     # find chunk of matches with varying goodness and use match filter
     result = []
     matches = mongo_client["UDPDating"]["Matches"]
-    for document in users.find(match_filter, skip=skip, limit=limit):
-        if document["user"] == user["user"]:
+    for them in users.find(match_filter, skip=skip, limit=limit):
+        # cannot match oneself
+        if them["user"] == me["user"]:
             continue
-        user1, user2 = mongo.get_match_edge_order(document["user"], user["user"])
-        if matches.find_one({"$and": [{"user1": user1}, {"user2": user2}]}) is not None:
+        # cannot rematch
+        if matches.find_one({"$and": [{"from": me["user"]}, {"to": them["user"]}]}) is not None:
             continue
-        result.append(document["user"])
+        # cannot match someone who already rejected me
+        existing_match = matches.find_one({"$and": [{"from": them["user"]}, {"to": me["user"]}]})
+        if existing_match is not None and not existing_match["success"]:
+            continue
+
+        result.append(them["user"])
 
     # sort by score in descending order (best match first)
-    result.sort(key=lambda item: mongo.get_match_score(user["user"], item), reverse=True)
+    result.sort(key=lambda item: mongo.get_match_score(me["user"], item), reverse=True)
 
     # return the actual number of results and the results
     return JSONResponse({"error": SUCCESS, "content": {"count": len(result), "matches": result}})
