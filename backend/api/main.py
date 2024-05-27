@@ -1,3 +1,4 @@
+import collections
 import datetime
 
 import uvicorn
@@ -22,10 +23,8 @@ NONEXISTENT_USER = 4
 INVALID_PASSWORD = 5
 INVALID_LOGIN = 6
 SESSION_TIMED_OUT = 7
+LIMIT_TOO_LONG = 8
 
-############ CONSTANTS #################
-
-SESSION_TIMEOUT_DURATION = datetime.timedelta(hours=1)
 
 app = FastAPI()
 
@@ -139,7 +138,7 @@ async def login(username: str, password: str) -> JSONResponse:
         "error": SUCCESS, 
         "content": {
             "access-token": access_token,
-            "expired": (now + SESSION_TIMEOUT_DURATION).timestamp()
+            "expired": (now + mongo.get_access_token_duration()).timestamp()
         }
     })
 
@@ -153,7 +152,7 @@ async def regenerate_token(username: str, access_token: str) -> JSONResponse:
         session_document = sessions.find_one({"$and": [{"user": username}, {"access-token": access_token}]})
         if session_document is None:
             return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
-        elif now > datetime.datetime.fromtimestamp(session_document["created"]) + SESSION_TIMEOUT_DURATION:
+        elif now > datetime.datetime.fromtimestamp(session_document["created"]) + mongo.get_access_token_duration():
             return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
         else:
             sessions.update_one(
@@ -168,25 +167,62 @@ async def regenerate_token(username: str, access_token: str) -> JSONResponse:
         "error": SUCCESS,
         "content": {
             "access-token": new_token,
-            "expired": (now + SESSION_TIMEOUT_DURATION).timestamp()
+            "expired": (now + mongo.get_access_token_duration()).timestamp()
         }
     })
 
 @app.get("/api/validate_token")
 async def validate_token(username: str, access_token: str) -> JSONResponse:
-    mongo_client = mongo.get_mongo_client()
-    now = datetime.datetime.now()
-    sessions = mongo_client["UDPDating"]["Sessions"]
-    try:
-        session_document = sessions.find_one({"$and": [{"user": username}, {"access-token": access_token}]})
-        if session_document is None:
+    match mongo.validate_token_internal(username, access_token):
+        case mongo.InternalErrorCode.SUCCESS:
+            return JSONResponse({"error": SUCCESS})
+        case mongo.InternalErrorCode.INVALID_LOGIN:
             return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
-        elif now > datetime.datetime.fromtimestamp(session_document["created"]) + SESSION_TIMEOUT_DURATION:
+        case mongo.InternalErrorCode.SESSION_TIMED_OUT:
             return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
-    except Exception as e:
-        print("Unknown error: exception below")
-        print(e)
-        return JSONResponse({"error": FAILED_MONGODB_ACTION})
-    return JSONResponse({"error": SUCCESS})
+        case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+            return JSONResponse({"error": FAILED_MONGODB_ACTION})
+        case _:
+            return JSONResponse({"error": INVALID_LOGIN}, status_code=500)
+
+@app.get("/api/search_potential_matches")
+async def search_potential_matches(username: str, access_token: str, skip: int = 0, limit: int = 10, ide: bool = False, os: bool = False, pl: bool = False) -> JSONResponse:
+    if limit > mongo.get_search_limit():
+        return JSONResponse({"error": LIMIT_TOO_LONG})
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    mongo_client = mongo.get_mongo_client()
+    users = mongo_client["UDPDating"]["Users"]
+    user = users.find_one({"user": username})
+
+    # create profile filter
+    conditions = {"ide": ide, "os": os, "pl": pl}
+    match_filter = collections.defaultdict(list)
+    for key, cond in conditions.items():
+        if cond and key in user["profile"]:
+            match_filter["$and"].append({f"profile.{key}": {"$regex": user["profile"][key], "$options": "i"}})
+
+    # find chunk of matches with varying goodness and use match filter
+    result = []
+    matches = mongo_client["UDPDating"]["Matches"]
+    for document in users.find(match_filter, skip=skip, limit=limit):
+        if document["user"] == user["user"]:
+            continue
+        user1, user2 = mongo.get_match_edge_order(document["user"], user["user"])
+        if matches.find_one({"$and": [{"user1": user1}, {"user2": user2}]}) is not None:
+            continue
+        result.append(document["user"])
+
+    # sort by score in descending order (best match first)
+    result.sort(key=lambda item: mongo.get_match_score(user["user"], item), reverse=True)
+
+    # return the actual number of results and the results
+    return JSONResponse({"error": SUCCESS, "content": {"count": len(result), "matches": result}})
 
 uvicorn.run(app, port=12345, host="0.0.0.0")
