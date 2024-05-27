@@ -24,6 +24,7 @@ INVALID_PASSWORD = 5
 INVALID_LOGIN = 6
 SESSION_TIMED_OUT = 7
 LIMIT_TOO_LONG = 8
+DUPLICATE_MATCH = 9
 
 
 app = FastAPI()
@@ -230,5 +231,25 @@ async def search_potential_matches(username: str, access_token: str, skip: int =
 
     # return the actual number of results and the results
     return JSONResponse({"error": SUCCESS, "content": {"count": len(result), "matches": result}})
+
+@app.post("/api/resolve_match")
+async def resolve_match(username: str, access_token: str, to: str, success: bool) -> JSONResponse:
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    mongo_client = mongo.get_mongo_client()
+    matches_collection = mongo_client["UDPDating"]["Matches"]
+
+    duplicate_match = matches_collection.find_one({"$and": [{"from": username}, {"to": to}]})
+    if duplicate_match is not None:
+        return JSONResponse({"error": DUPLICATE_MATCH})
+    
+    matches_collection.insert_one({"from": username, "to": to, "success": success})
+    return JSONResponse({"error": SUCCESS})
 
 uvicorn.run(app, port=12345, host="0.0.0.0")
