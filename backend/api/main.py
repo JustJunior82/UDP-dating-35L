@@ -66,26 +66,30 @@ async def get_profile(username: str):
 # 1. the user exists (otherwise throw nonexistent user error)
 # 2. the password hash is correct using hasher
 @app.post("/api/post_profile")
-async def post_profile(username: str, password: str, profile_key: str, profile: str):
-    user = mongo.get_mongo_client()["UDPDating"]["Users"].find_one({"user": username})
-    if not user:
-        return JSONResponse({"error": NONEXISTENT_USER})
-    
-    if not hasher.verify_password(password, user["passhex"]):
-        return JSONResponse({"error": INVALID_PASSWORD})
+async def post_profile(username: str, access_token: str, profile_key: str, profile: str):
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
     
     sanitized_profile = sanitizer.sanitize_string(profile)
     mongo.post_profile(username, profile_key, sanitized_profile)
     return JSONResponse({"error": SUCCESS})
 
 @app.post("/api/delete_profile_key")
-async def delete_profile_key(username: str, password: str, profile_key: str):
-    user = mongo.get_mongo_client()["UDPDating"]["Users"].find_one({"user": username})
-    if not user:
-        return JSONResponse({"error": NONEXISTENT_USER})
-    
-    if not hasher.verify_password(password, user["passhex"]):
-        return JSONResponse({"error": INVALID_PASSWORD})
+async def delete_profile_key(username: str, access_token: str, profile_key: str):
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
 
     mongo.delete_profile_key(username, profile_key)
     return JSONResponse({"error": SUCCESS})

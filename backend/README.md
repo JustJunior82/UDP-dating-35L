@@ -37,7 +37,7 @@ Posts a profile entry for a user.
 
 **Parameters:**
 - `username` (str): The username of the user.
-- `password` (str): The user's password.
+- `access_token` (str): The user's access token.
 - `profile_key` (str): The key for the profile entry.
 - `profile` (str): The value for the profile entry.
 
@@ -50,7 +50,7 @@ Deletes a profile key for a user.
 
 **Parameters:**
 - `username` (str): The username of the user.
-- `password` (str): The user's password.
+- `access_token` (str): The user's access token.
 - `profile_key` (str): The key to delete from the profile.
 
 **Returns:**
