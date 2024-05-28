@@ -108,6 +108,26 @@ Validate a token given a username and access token.
 **Returns:**
 - An error code
 
+@app.get("/api/search_potential_matches")
+async def search_potential_matches(username: str, access_token: str, skip: int = 0, limit: int = 10, ide: bool = False, os: bool = False, pl: bool = False) -> JSONResponse:
+
+## GET /api/search_potential_matches
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+- `skip` (int): The number of entries to skip. After querying n items, the next query should use skip=n.
+- `limit` (int): The limit of number of searches. You are guaranteed that the number of search results is less than or equal to limit, possibly 0.
+- `ide` (bool): Whether or not to filter for IDE.
+- `os` (bool): Whether or not to filter for operating system.
+- `pl` (bool): Whether or not to filter for programming language.
+
+**Notes:**
+- Other profile attributes can be added, but these are the only ones currently assessed for matching.
+
+**Returns:**
+- An error code
+
 ## BUILD ##
 
 Given the right dependencies have been installed, putting the working directory in "api" and executing "python3 main.py" should run the server on port 12345.

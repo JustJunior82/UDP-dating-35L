@@ -105,11 +105,11 @@ def get_match_score(my_user: str, their_user: str) -> float:
     their_profile = users_collection.find_one({"user": their_user})["profile"]
 
     score = 0
-    weight_map = {"ide": 0.45, "os": 0.2, "pl": 0.35}
+    weight_map = {"ide": 0.45, "os": 0.2, "pl": 0.35} # TODO: consider move random constants into config
     for key, coeff in weight_map.items():
         value = Levenshtein.ratio(my_profile.get(key, ""), their_profile.get(key, ""))
         score += coeff * value
     return score
 
 def get_search_limit() -> int:
-    return 100
+    return 100 # TODO: consider move random constants into config
