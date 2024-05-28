@@ -256,4 +256,34 @@ async def resolve_potential_match(username: str, access_token: str, to: str, suc
     matches_collection.insert_one({"from": username, "to": to, "success": success})
     return JSONResponse({"error": SUCCESS})
 
+@app.get("/api/get_matches")
+async def get_matches(username: str, access_token: str) -> JSONResponse:
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    mongo_client = mongo.get_mongo_client()
+    matches_collection = mongo_client["UDPDating"]["Matches"]
+    
+    # currently, the assumption is that you will match with few people and will not need it chunked
+    potential_matches = set()
+    for potential_match in matches_collection.find({"$or": [{"from": username}, {"to": username}]}):
+        if potential_match["success"]:
+            potential_matches.add((potential_match["from"], potential_match["to"]))
+    
+    matches = set()
+    for from_user, to_user in potential_matches:
+        if (to_user, from_user) in potential_matches:
+            if from_user == username:
+                matches.add(to_user)
+            else:
+                matches.add(from_user)
+
+    return JSONResponse({"error": SUCCESS, "content": {"count": len(matches), "matches": list(matches)}})
+
+
 uvicorn.run(app, port=12345, host="0.0.0.0")
