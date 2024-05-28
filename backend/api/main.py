@@ -236,8 +236,8 @@ async def search_potential_matches(username: str, access_token: str, skip: int =
     # return the actual number of results and the results
     return JSONResponse({"error": SUCCESS, "content": {"count": len(result), "matches": result}})
 
-@app.post("/api/resolve_match")
-async def resolve_match(username: str, access_token: str, to: str, success: bool) -> JSONResponse:
+@app.post("/api/resolve_potential_match")
+async def resolve_potential_match(username: str, access_token: str, to: str, success: bool) -> JSONResponse:
     if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
         match auth:
             case mongo.InternalErrorCode.INVALID_LOGIN:
