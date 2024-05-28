@@ -108,25 +108,54 @@ Validate a token given a username and access token.
 **Returns:**
 - An error code
 
-@app.get("/api/search_potential_matches")
-async def search_potential_matches(username: str, access_token: str, skip: int = 0, limit: int = 10, ide: bool = False, os: bool = False, pl: bool = False) -> JSONResponse:
-
 ## GET /api/search_potential_matches
+
+Search for potential matches, ranked according to the algorithm.
 
 **Parameters:**
 - `username` (str): The username for the existing user.
 - `access_token` (str): The valid access token for the existing user.
-- `skip` (int): The number of entries to skip. After querying n items, the next query should use skip=n.
-- `limit` (int): The limit of number of searches. You are guaranteed that the number of search results is less than or equal to limit, possibly 0.
-- `ide` (bool): Whether or not to filter for IDE.
-- `os` (bool): Whether or not to filter for operating system.
-- `pl` (bool): Whether or not to filter for programming language.
+- `skip` (int, default=0): The number of entries to skip. After querying n items, the next query should use skip=n.
+- `limit` (int, default=100): The limit of number of searches. You are guaranteed that the number of search results is less than or equal to limit, possibly 0. The limit cannot exceed 100.
+- `ide` (bool, default=false): Whether or not to filter for IDE.
+- `os` (bool, default=false): Whether or not to filter for operating system.
+- `pl` (bool, default=false): Whether or not to filter for programming language.
 
 **Notes:**
 - Other profile attributes can be added, but these are the only ones currently assessed for matching.
+- Booleans in FastAPI can be set according to https://fastapi.tiangolo.com/tutorial/query-params/#query-parameter-type-conversion tldr; just use 0 (false) or 1 (true)
+- Setting all of ide, os, pl to false means that there is no filter. Anyone can be considered a match, and they will still be ranked according to algorithm.
 
 **Returns:**
 - An error code
+- `count` (int): the number of potential matches
+- `matches` (list[str]): list of potential_matches by username ordered from best to worst
+
+## POST /api/resolve_potential_match
+
+Indicate whether a potential match should be accepted or not.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+- `to` (str): A username indicating to whom we are resolving the match.
+- `success` (bool): If we want to accept the potential match to a given username.
+
+**Returns:**
+- An error code
+
+## GET /api/get_matches
+
+Get two-way resolved matches where both you and the other person have accepted.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+
+**Returns:**
+- An error code
+- `count` (int): the number of matches
+- `matches` (list[str]): list of matches
 
 ## BUILD ##
 
