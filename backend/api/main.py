@@ -191,7 +191,7 @@ async def validate_token(username: str, access_token: str) -> JSONResponse:
             return JSONResponse({"error": INVALID_LOGIN}, status_code=500)
 
 @app.get("/api/search_potential_matches")
-async def search_potential_matches(username: str, access_token: str, skip: int = 0, limit: int = 10, ide: bool = False, os: bool = False, pl: bool = False) -> JSONResponse:
+async def search_potential_matches(username: str, access_token: str, skip: int = 0, limit: int = 100, ide: bool = False, os: bool = False, pl: bool = False) -> JSONResponse:
     if limit > mongo.get_search_limit():
         return JSONResponse({"error": LIMIT_TOO_LONG})
     if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
