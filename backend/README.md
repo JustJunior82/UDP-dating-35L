@@ -68,6 +68,7 @@ Registers a new user.
 **Returns:**
 - A JSON response indicating success or failure (e.g., invalid email, duplicate user or email, failed MongoDB action).
 
+=======
 ## POST /api/login
 
 Login an existing user and get an access token.
@@ -156,6 +157,16 @@ Get two-way resolved matches where both you and the other person have accepted.
 - An error code
 - `count` (int): the number of matches
 - `matches` (list[str]): list of matches
+
+### POST /api/img2ascii
+
+Convert an image to ASCII. Image should either have Content-Type image/jpeg or image/png.
+
+**Parameters:**
+- `image` (str): The filename.
+
+**Returns:**
+- ASCII string
 
 ## BUILD ##
 

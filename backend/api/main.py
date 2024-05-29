@@ -1,9 +1,11 @@
 import collections
 import datetime
 
+import ascii_magic
+import PIL.Image
 import uvicorn
 from email_validator import validate_email, EmailNotValidError
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -25,7 +27,10 @@ INVALID_LOGIN = 6
 SESSION_TIMED_OUT = 7
 LIMIT_TOO_LONG = 8
 DUPLICATE_MATCH = 9
-
+UNSUPPORTED_IMAGE_FORMAT = 10
+IMAGE_TOO_LARGE = 11
+FAILED_ASCII_MAGIC_ACTION = 12
+FAILED_PIL_ACTION = 13
 
 app = FastAPI()
 
@@ -285,5 +290,28 @@ async def get_matches(username: str, access_token: str) -> JSONResponse:
 
     return JSONResponse({"error": SUCCESS, "content": {"count": len(matches), "matches": list(matches)}})
 
+@app.post("/api/img2ascii")
+async def img2ascii(image: UploadFile) -> JSONResponse:
+    COLUMNS = 200
+    FILE_SIZE_LIMIT_BYTES = 2000000
+
+    if image.content_type != "image/jpeg" and image.content_type != "image/png":
+        return JSONResponse({"error": UNSUPPORTED_IMAGE_FORMAT}, status_code=422)
+    file_size = len(image.file.read())
+    if file_size > FILE_SIZE_LIMIT_BYTES:
+        return JSONResponse({"error": IMAGE_TOO_LARGE}, status_code=422)
+    image.file.seek(0)
+
+    try:
+        pillow_image = PIL.Image.open(image.file)
+    except Exception:
+        return JSONResponse({"error": FAILED_PIL_ACTION})
+    
+    try:
+        art = ascii_magic.AsciiArt.from_pillow_image(pillow_image)
+    except Exception:
+        return JSONResponse({"error": FAILED_ASCII_MAGIC_ACTION})
+    
+    return JSONResponse({"error": SUCCESS, "content": art.to_ascii(COLUMNS)})
 
 uvicorn.run(app, port=12345, host="0.0.0.0")
