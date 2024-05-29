@@ -1,15 +1,15 @@
 import React from "react";
 
 async function get_profile_data(username) {
-    const response = await fetch("http://0.0.0.0:12345/api/get_profile", {
-        method: 'GET',
-        headers: {
-            'content-type': 'application/json'
-        },
-		body: JSON.stringify({username: username})
-    });
-    const profile = await response.json();
-    console.log(profile);
+    // const response = await fetch("http://0.0.0.0:12345/api/get_profile", {
+    //     method: 'GET',
+    //     headers: {
+    //         'content-type': 'application/json'
+    //     },
+	// 	body: JSON.stringify({username: username})
+    // });
+    // const profile = await response.json();
+    // console.log(profile);
 }
 
 async function post_profile(username) {

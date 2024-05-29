@@ -91,6 +91,40 @@ async function createUser(email, username, password) {
     }
 }
 
+// username: testuser
+// password: 1234
+// email: test@test.com
+
+async function requestLogin(username, password) {
+    let response = await fetch('http://localhost:12345/api/login', {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json'
+        },
+		body: JSON.stringify({username: username, password: password, email: ""})
+    });
+
+    if(await response.status !== 200) {
+        alert("Login failed!");
+        return;
+    }
+
+    let json = await response.json();
+    console.log(json);
+
+    switch (json.error) {
+        case 6:
+            alert("Invalid email or password. Please try again");
+            return false;
+        case 3:
+            alert("Database Error, please try again later");
+            return false;
+        default:
+            console.log("Success Logging in ...");
+            return true;
+    }
+}
+
 function Login(setLogin) {
     const [isRegistered, setRegistered] = useState(false);
     const [username, setUsername] = useState('');
@@ -104,16 +138,11 @@ function Login(setLogin) {
 
     function handleLogin(event) {
         event.preventDefault()
-        // Implement API Authentication call
         console.log("attemped login");
-        let auth = false;
-        // let userData = { username: "dummy user",  image: "image-url", preferences: ["A", "B", "C"] };
-        
-        if (auth) {
-            // setLogin(userData);
-            // After Login, redirect to Profile Page
-            handleRedirect();
-        }
+        requestLogin(username, password).then(success => {
+            if (success) {
+                handleRedirect();
+            }});
     }
 
     function handleRegistration(event) {
