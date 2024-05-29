@@ -35,20 +35,20 @@ const DefaultNavBar = () => {
         <>
             <Nav>
                 <NavMenu>
-                    <NavLink to="/" activeStyle>
+                    <NavLink to="/" >
                         Home
                     </NavLink>
-                    <NavLink to="/about" activeStyle>
+                    <NavLink to="/about" >
                         About
                     </NavLink>
-                    <NavLink to="/contact" activeStyle>
+                    <NavLink to="/contact" >
                         Contact Us
                     </NavLink>
-                    <NavLink to="/posts" activeStyle>
+                    <NavLink to="/posts" >
                         Posts
                     </NavLink>
-                    <NavLink to="/login" activeStyle>
-                        Login
+                    <NavLink to="/login" >
+                        Login/Register
                     </NavLink>
                 </NavMenu>
             </Nav>

@@ -12,7 +12,7 @@ function renderPosts(info) {
     <>
         {info.map((user) => {return (
             <>
-                <div>
+                <div key={user.username}>
                     <h3>{user.username}</h3>
                     <img src={user.image} alt=""></img>
                     <ul>
@@ -82,7 +82,7 @@ function Search(update) { // handles input filtering and relays information to b
 }
 
 function Posts() {
-    const [preferences, setPreferences] = useState([]);
+    // const [preferences, setPreferences] = useState([]);
     const [posts, setPosts] = useState([ //dummy function
         // can get backend to display profiles in order of popularity? 
         // send info of click to backend and keep track of number of page visits?
