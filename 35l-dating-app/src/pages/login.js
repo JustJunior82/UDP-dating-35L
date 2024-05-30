@@ -59,12 +59,16 @@ function UnregisteredPage ({handleSubmit, setEmail, setUsername, setPassword, to
 );}
 
 async function createUser(email, username, password) {
-    let response = await fetch('http://localhost:12345/api/register', {
+    let registrationURL = new URL('http://localhost:12345/api/register');
+    registrationURL.searchParams.append("username", username);
+    registrationURL.searchParams.append("password", password);
+    registrationURL.searchParams.append("email", email);
+    let response = await fetch(registrationURL, {
         method: 'POST',
         headers: {
             'content-type': 'application/json'
         },
-		body: JSON.stringify({username: username, password: password, email: email})
+		// body: JSON.stringify({username: username, password: password, email: email})
     });
 
     if(await response.status !== 200) {
@@ -95,8 +99,12 @@ async function createUser(email, username, password) {
 // password: 1234
 // email: test@test.com
 
+// username: testuser2
+// password: 1234
+// email: testuser2@gmail.com
+
 async function requestLogin(username, password) {
-    var loginUrl = new URL('http://localhost:12345/api/login');
+    let loginUrl = new URL('http://localhost:12345/api/login');
     loginUrl.searchParams.append("username", username);
     loginUrl.searchParams.append("password", password);
     let response = await fetch(loginUrl.toString(), {

@@ -6,22 +6,22 @@ const AuthNavbar = () => {
         <>
             <Nav>
                 <NavMenu>
-                    <NavLink to="/" activeStyle>
+                    <NavLink to="/" >
                         Home
                     </NavLink>
-                    <NavLink to="/about" activeStyle>
+                    <NavLink to="/about" >
                         About
                     </NavLink>
-                    <NavLink to="/contact" activeStyle>
+                    <NavLink to="/contact" >
                         Contact Us
                     </NavLink>
-                    <NavLink to="/posts" activeStyle>
+                    <NavLink to="/posts" >
                         Posts
                     </NavLink>
-                    <NavLink to="/profile" activeStyle>
+                    <NavLink to="/profile" >
                         Profile
                     </NavLink>
-                    <NavLink to="/settings" activeStyle>
+                    <NavLink to="/settings" >
                         Settings
                     </NavLink>
                 </NavMenu>
