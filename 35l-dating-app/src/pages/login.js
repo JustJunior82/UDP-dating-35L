@@ -96,15 +96,17 @@ async function createUser(email, username, password) {
 // email: test@test.com
 
 async function requestLogin(username, password) {
-    let response = await fetch('http://localhost:12345/api/login', {
+    var loginUrl = new URL('http://localhost:12345/api/login');
+    loginUrl.searchParams.append("username", username);
+    loginUrl.searchParams.append("password", password);
+    let response = await fetch(loginUrl.toString(), {
         method: 'POST',
         headers: {
             'content-type': 'application/json'
         },
-		body: JSON.stringify({username: username, password: password, email: ""})
     });
 
-    if(await response.status !== 200) {
+    if (response.status !== 200) {
         alert("Login failed!");
         return;
     }
