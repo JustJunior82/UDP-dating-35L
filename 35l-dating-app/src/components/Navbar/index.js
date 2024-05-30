@@ -48,7 +48,7 @@ const DefaultNavBar = () => {
                         Posts
                     </NavLink>
                     <NavLink to="/login" >
-                        Login/Register
+                        Login
                     </NavLink>
                 </NavMenu>
             </Nav>

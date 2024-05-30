@@ -11,16 +11,14 @@ function renderPosts(info) {
     return (
     <>
         {info.map((user) => {return (
-            <>
-                <div key={user.username}>
-                    <h3>{user.username}</h3>
-                    <img src={user.image} alt=""></img>
-                    <ul>
-                        {user.preferences.map((item, index) => (
-                        <li key={index}>{item}</li>))}
-                    </ul>
-                </div>
-            </>);
+            <div key={user.username}>
+                <h3>{user.username}</h3>
+                <img src={user.image} alt=""></img>
+                <ul>
+                    {user.preferences.map((item, index) => (
+                    <li key={index}>{item}</li>))}
+                </ul>
+            </div>);
         })}
     </>);
 }
