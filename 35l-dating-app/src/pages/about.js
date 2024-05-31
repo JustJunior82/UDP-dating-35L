@@ -29,7 +29,7 @@ Once both users add each other as potential matches, they can message each other
             <h4>Features:</h4>
             <ul>
                 <li>Displaying Dynamic Data: shows suggested matches by displaying other users profiles</li>
-                <li>Uploading Data: users can upload their own profiles/posts to the server</li>
+                <li>Uploading Data: users can upload their own profiles to the server</li>
                 <li>Searching through Data:
                     <ul>
                         <li>Users can search directly to look at other users' profile and READMEs (bio's)</li>
