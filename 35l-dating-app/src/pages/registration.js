@@ -41,6 +41,11 @@ async function createUser(email, username, password) {
 
 async function postProfile(username, password, props) {
     let errors = false;
+
+    const date = new Date();
+    let joinDate = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0");
+    props = {...props, joinDate: joinDate};
+
     for (const [key, value] of Object.entries(props)) {
         if (value === '') {
             alert("Please fill out all fields");
@@ -147,22 +152,45 @@ const profileCreation = (props) => {
 }
 
 const preferenceSelection = (props) => {
+    let preferences = ["ide", "os", "women", "eggert", "cs35L", "cs33L"];
+
+    const handleChange = (event) => {
+        const { value, checked } = event.target;
+
+        console.log(`${value} is ${checked}`);
+
+        if (checked) {
+            props.setPreferences([...props.preferences, value]);
+        }
+        else {
+            props.setPreferences(props.preferences.filter((event) => event !== value));
+        }
+        console.log("new preferences:", props.preferences);
+    }
+
     return (
         <>
-            <h1>Choose your Dating Preferences</h1>
-            <button onClick={props.handleSubmitPreferences}>Finish Profile Creation</button>
+            <h1>What things are you interested in (We'll use these to help match you with others)</h1>
+            <form>
+                {preferences.map((item, index) => (
+                    <div key={index}>
+                        <input type="checkbox" name={item} value={item} onChange={handleChange}/>
+                        <label>{item}</label><br/>
+                    </div>))}
+                <button onClick={props.handleSubmitPreferences}>Finish Profile Creation</button>
+            </form>
         </>
-    )
+    );
 }
 
 function Registration ({ userInfo, setUserInfo }) {
     // General States
-    const [part, setPart] = useState(1);
+    const [part, setPart] = useState(2);
     const navigate = useNavigate();
 
     // Registration States
     const [email, setEmail] = useState('');
-    
+
     // lifting state functions
     function setUsername(val) {
         setUserInfo({...userInfo, username: val});
@@ -176,8 +204,10 @@ function Registration ({ userInfo, setUserInfo }) {
     const [state, setState] = useState('');
     const [birthday, setBirthday] = useState('');
     const [bio, setBio] = useState('');
-
     const [image, setImage] = useState('');
+
+    // Preference Selection States
+    const [preferences, setPreferences] = useState([]);
 
     function handleRegistration(event) {
         event.preventDefault();
@@ -197,8 +227,13 @@ function Registration ({ userInfo, setUserInfo }) {
         });
     }
 
-    function handleSubmitPreferences() {
-        navigate("/profile");
+    function handleSubmitPreferences(event) {
+        event.preventDefault();
+        // console.log("submitting preferences:", preferences)
+        postProfile(userInfo.username, userInfo.password, { preferences: preferences }).then(success => {
+            if (success)
+                navigate("/profile");
+        });
     }
 
     // Registration State Handlers
@@ -256,6 +291,8 @@ function Registration ({ userInfo, setUserInfo }) {
                 handleImageChange: handleImageChange});
         case 2:
             return preferenceSelection({
+                preferences: preferences,
+                setPreferences: setPreferences,
                 handleSubmitPreferences: handleSubmitPreferences});
     }
 };
