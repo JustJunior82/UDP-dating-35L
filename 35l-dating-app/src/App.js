@@ -29,8 +29,9 @@ function App() {
         password: "1234",
         token: "",
         expiration: "",
-        message: "default"
+        message: "default",
     });
+    // const [userProfile, setUserProfile] = useState({});
     const [visitingProfile, setVisitingProfile] = useState(false);
     const [visitingUsername, setVisitingUsername] = useState("");
 
