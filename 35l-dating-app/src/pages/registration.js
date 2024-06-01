@@ -70,7 +70,6 @@ async function postProfile(username, password, props) {
         }
     
         let json = await response.json();
-        console.log(json);
     
         if (json.error !== 0) {
             errors = true;
