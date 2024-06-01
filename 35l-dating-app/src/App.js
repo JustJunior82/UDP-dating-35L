@@ -11,7 +11,6 @@ import { useState } from "react";
 
 import Home from "./pages";
 import About from "./pages/about";
-import Posts from "./pages/posts";
 import Login from "./pages/login";
 import Contact from "./pages/contact";
 import Profile from "./pages/profile";
@@ -47,7 +46,6 @@ function App() {
                 <Route exact path="/" element={<Home isAuth={String(isLoggedIn)} onLogIn={() => setLogin(true)} onLogOut={() => setLogin(false)}/>} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/posts" element={<Posts />} />
                 <Route path="/login" element={<Login userInfo={userInfo} setUserInfo={setUserInfo} setLogin={(props) => handleLogin(props)}/>} />
                 {/* unaccessable until logged in */}
                 <Route path="/profile" element={<Profile userInfo={userInfo} 

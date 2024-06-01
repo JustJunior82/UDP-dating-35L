@@ -15,9 +15,6 @@ const AuthNavbar = () => {
                     <NavLink to="/contact" >
                         Contact Us
                     </NavLink>
-                    <NavLink to="/posts" >
-                        Posts
-                    </NavLink>
                     <NavLink to="/profile" >
                         Profile
                     </NavLink>
@@ -46,9 +43,6 @@ const DefaultNavBar = () => {
                     </NavLink>
                     <NavLink to="/contact" >
                         Contact Us
-                    </NavLink>
-                    <NavLink to="/posts" >
-                        Posts
                     </NavLink>
                     <NavLink to="/login" >
                         Login
