@@ -32,7 +32,7 @@ function App() {
         message: "default"
     });
     const [visitingProfile, setVisitingProfile] = useState(false);
-    const [friendUsername, setFriendUsername] = useState("");
+    const [visitingUsername, setVisitingUsername] = useState("");
 
     function handleLogin(props) {
         setLogin(true);
@@ -54,8 +54,8 @@ function App() {
                     setMessage={(friendUsername) => setUserInfo({ ...userInfo, message: friendUsername })} 
                     visitingProfile={visitingProfile}
                     setVisitingProfile={setVisitingProfile}
-                    friendUsername={friendUsername}
-                    setFriendUsername={setFriendUsername}/>} />
+                    visitingUsername={visitingUsername}
+                    setVisitingUsername={setVisitingUsername}/>} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/messages" element={<Messages userInfo={userInfo}/>} />
                 {/* hidden page only accessible when registering */}
