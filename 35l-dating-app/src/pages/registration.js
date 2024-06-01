@@ -47,10 +47,10 @@ async function postProfile(username, password, props) {
     props = {...props, joinDate: joinDate};
 
     for (const [key, value] of Object.entries(props)) {
-        if (value === '') {
-            alert("Please fill out all fields");
-            return false;
-        }
+        // if (value === '') {
+        //     alert("Please fill out all fields");
+        //     return false;
+        // }
         let profileURL = new URL('http://localhost:12345/api/post_profile');
         profileURL.searchParams.append("username", username);
         profileURL.searchParams.append("password", password);
@@ -185,7 +185,7 @@ const preferenceSelection = (props) => {
 
 function Registration ({ userInfo, setUserInfo }) {
     // General States
-    const [part, setPart] = useState(2);
+    const [part, setPart] = useState(0);
     const navigate = useNavigate();
 
     // Registration States
@@ -213,7 +213,11 @@ function Registration ({ userInfo, setUserInfo }) {
         event.preventDefault();
         createUser(email, userInfo.username, userInfo.password).then(success => {
             if (success) {
-                setPart(1);
+                let data = {"country": "", "state": "", "birthday": "", "bio": "", "pfp": "", "preferences": "", "friends": ""}
+                postProfile(userInfo.username, userInfo.password, data).then(success => {
+                    if (success)
+                        setPart(1);
+                });
             }});
     }
 

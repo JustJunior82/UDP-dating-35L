@@ -23,33 +23,44 @@ async function get_profile_data(username) {
     return false;
 }
 
-function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, friendUsername, setFriendUsername }) {
+function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, visitingUsername, setVisitingUsername }) {
     const [found, setFound] = useState(false);
     const [profileData, setProfileData] = useState({ preferences: "", friends: ""});
+    const [isFriend, setIsFriend] = useState(false);
     const navigate = useNavigate();
 
     function requestProfile(username) {
         get_profile_data(username).then(success => {
-            console.log(success);
             if (success) {
                 setFound(true);
                 setProfileData(success);
-                // console.log("profile_data:", success);
+                if (visitingProfile && success.friends.split(",").includes(userInfo.username)) {
+                    setIsFriend(true);
+                }
             }
         });
     }
 
-    function handleProfileRedirect(friendUsername) {
+    // error from redirecting to another proifle from friend proifle
+    function handleProfileRedirect(visitingUsername) {
         // redirect to profile page of friend
-        setVisitingProfile(true);
-        setFriendUsername(friendUsername);
-        setFound(false);
-        // setProfileData({ preferences: "", friends: ""});
+        if (visitingUsername === userInfo.username) {
+            setVisitingProfile(false);
+            setVisitingUsername("");
+            setProfileData({ preferences: "", friends: "" });
+            setFound(false);
+        } 
+        else {
+            setVisitingProfile(true);
+            setVisitingUsername(visitingUsername);
+            setProfileData({ preferences: "", friends: "" });
+            setFound(false);
+        }
     }
 
-    function handleMessageRedirect(friendUsername) {
+    function handleMessageRedirect(visitingUsername) {
         // redirect to profile page of friend
-        setMessage(friendUsername);
+        setMessage(visitingUsername);
         // set current messaging higher state to friend's username
         navigate("/messages");
     }
@@ -59,28 +70,47 @@ function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, f
             requestProfile(userInfo.username);
         }
         else {
-            console.log("requesting friend proifle data");
-            requestProfile(friendUsername);
+            // console.log("requesting friend proifle data");
+            requestProfile(visitingUsername);
         }
         
     }
 
-    function visiting() {
+    function visitingHeader() {
         if (visitingProfile) {
             return (
             <>
                 <button onClick={() => {setVisitingProfile(false); setFound(false)}}>Back to my Profile</button>
-                <h1> Username: {friendUsername}</h1>
+                <h1> Username: {visitingUsername}</h1>
             </>);
         }
         else {
             return( <h1>Username: {userInfo.username}</h1>)
         }
     }
+
+    function handleFollow() {
+        // add visitng profile to 
+    }
+
+    function followButton() {
+        // let following = is a friend
+        if (!visitingProfile)
+            return;
+
+        if (!isFriend) {
+            return (<button onClick={handleFollow}>Follow</button>);
+        }
+        else {
+            return (<button>Following</button>);
+        }
+    }
+
     return(
         <> 
             <br/>
-            {visiting()}
+            {visitingHeader()}
+            {followButton()}
             <img src={profileData.pfp} alt=""></img>
             <h3>From: {profileData.state},{profileData.country}</h3>
             <h3>Joined: {profileData.joinDate}</h3>
