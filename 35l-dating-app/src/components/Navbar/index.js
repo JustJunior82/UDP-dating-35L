@@ -6,22 +6,22 @@ const AuthNavbar = () => {
         <>
             <Nav>
                 <NavMenu>
-                    <NavLink to="/" activeStyle>
+                    <NavLink to="/" >
                         Home
                     </NavLink>
-                    <NavLink to="/about" activeStyle>
+                    <NavLink to="/about" >
                         About
                     </NavLink>
-                    <NavLink to="/contact" activeStyle>
+                    <NavLink to="/contact" >
                         Contact Us
                     </NavLink>
-                    <NavLink to="/posts" activeStyle>
-                        Posts
-                    </NavLink>
-                    <NavLink to="/profile" activeStyle>
+                    <NavLink to="/profile" >
                         Profile
                     </NavLink>
-                    <NavLink to="/settings" activeStyle>
+                    <NavLink to="/messages" >
+                        Messages
+                    </NavLink>
+                    <NavLink to="/settings" >
                         Settings
                     </NavLink>
                 </NavMenu>
@@ -35,19 +35,16 @@ const DefaultNavBar = () => {
         <>
             <Nav>
                 <NavMenu>
-                    <NavLink to="/" activeStyle>
+                    <NavLink to="/" >
                         Home
                     </NavLink>
-                    <NavLink to="/about" activeStyle>
+                    <NavLink to="/about" >
                         About
                     </NavLink>
-                    <NavLink to="/contact" activeStyle>
+                    <NavLink to="/contact" >
                         Contact Us
                     </NavLink>
-                    <NavLink to="/posts" activeStyle>
-                        Posts
-                    </NavLink>
-                    <NavLink to="/login" activeStyle>
+                    <NavLink to="/login" >
                         Login
                     </NavLink>
                 </NavMenu>
