@@ -271,6 +271,7 @@ async def get_matches(username: str, access_token: str) -> JSONResponse:
                 return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
             case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
                 return JSONResponse({"error": FAILED_MONGODB_ACTION})
+
     mongo_client = mongo.get_mongo_client()
     matches_collection = mongo_client["UDPDating"]["Matches"]
     
@@ -313,5 +314,49 @@ async def img2ascii(image: UploadFile) -> JSONResponse:
         return JSONResponse({"error": FAILED_ASCII_MAGIC_ACTION})
     
     return JSONResponse({"error": SUCCESS, "content": art.to_ascii(COLUMNS)})
+
+######## MESSAGING ########
+
+@app.post("/api/clear_messages")
+async def clear_messages(username: str, access_token: str, to: str):
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+
+    mongo.clear_messages(username, to)
+    return JSONResponse({"error": SUCCESS})
+
+@app.post("/api/send_message")
+async def send_message(username: str, access_token: str, to: str, message: str):
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+
+    mongo.add_message(username, to, username, message)
+    return JSONResponse({"error": SUCCESS})
+
+@app.get("/api/fetch_messages")
+async def fetch_messages(username: str, access_token: str, to: str):
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+
+    messages = mongo.fetch_messages(username, to)
+    return JSONResponse({"error": SUCCESS, "content": messages})
 
 uvicorn.run(app, port=12345, host="0.0.0.0")
