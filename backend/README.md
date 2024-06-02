@@ -145,6 +145,23 @@ Indicate whether a potential match should be accepted or not.
 **Returns:**
 - An error code
 
+## GET /api/get_potential_matches
+
+Get one-way potential matches where the other person has requested a match with you.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+
+**Notes:**
+- This filters out people you have previously rejected or accepted. You cannot unreject people.
+- If you are looking for people who have requested you that you have also accepted, use `get_matches` instead.
+
+**Returns:**
+- An error code
+- `count` (int): the number of matches
+- `potential_matches` (list[str]): list of matches
+
 ## GET /api/get_matches
 
 Get two-way resolved matches where both you and the other person have accepted.
