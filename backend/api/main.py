@@ -292,7 +292,7 @@ async def get_matches(username: str, access_token: str) -> JSONResponse:
 
 @app.post("/api/img2ascii")
 async def img2ascii(image: UploadFile) -> JSONResponse:
-    COLUMNS = 200
+    COLUMNS = 120
     FILE_SIZE_LIMIT_BYTES = 2000000
 
     if image.content_type != "image/jpeg" and image.content_type != "image/png":
@@ -303,15 +303,26 @@ async def img2ascii(image: UploadFile) -> JSONResponse:
     image.file.seek(0)
 
     try:
-        pillow_image = PIL.Image.open(image.file)
+        pillow_image = PIL.Image.open(image.file).convert("RGB")
     except Exception:
         return JSONResponse({"error": FAILED_PIL_ACTION})
     
+    width, height = pillow_image.size   # Get dimensions
+
+    square_dim = min(width, height)
+    new_width = new_height = square_dim
+    left = (width - new_width)/2
+    top = (height - new_height)/2
+    right = (width + new_width)/2
+    bottom = (height + new_height)/2
+
+    square_image = pillow_image.crop((left, top, right, bottom))
+    
     try:
-        art = ascii_magic.AsciiArt.from_pillow_image(pillow_image)
+        art = ascii_magic.AsciiArt.from_pillow_image(square_image)
     except Exception:
         return JSONResponse({"error": FAILED_ASCII_MAGIC_ACTION})
-    
+
     return JSONResponse({"error": SUCCESS, "content": art.to_ascii(COLUMNS)})
 
 uvicorn.run(app, port=12345, host="0.0.0.0")
