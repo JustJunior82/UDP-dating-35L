@@ -8,6 +8,7 @@ from email_validator import validate_email, EmailNotValidError
 from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 ######## INTERNAL DEPENDENCIES ########
 
@@ -31,6 +32,9 @@ UNSUPPORTED_IMAGE_FORMAT = 10
 IMAGE_TOO_LARGE = 11
 FAILED_ASCII_MAGIC_ACTION = 12
 FAILED_PIL_ACTION = 13
+
+class ImageASCII(BaseModel):
+    image: str
 
 app = FastAPI()
 
@@ -307,7 +311,7 @@ async def get_profile_image(username: str, access_token: str) -> JSONResponse:
     return JSONResponse({"error": SUCCESS, "content": image})
 
 @app.post("/api/post_profile_image")
-async def post_profile_image(username: str, access_token: str, image: str) -> JSONResponse:
+async def post_profile_image(username: str, access_token: str, body: ImageASCII) -> JSONResponse:
     if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
         match auth:
             case mongo.InternalErrorCode.INVALID_LOGIN:
@@ -318,10 +322,9 @@ async def post_profile_image(username: str, access_token: str, image: str) -> JS
                 return JSONResponse({"error": FAILED_MONGODB_ACTION})
     mongo_client = mongo.get_mongo_client()
     users = mongo_client["UDPDating"]["Users"]
-    me = users.find_one({"user": username})
     # note: this currently assumes that the image field is always valid
-    # ideally, this should probably be checked (e.g. provide img2ascii validation)
-    me["image"] = image
+    # ideally, this should probably be checked (e.g. provide img2ascii validation
+    users.find_one_and_update({"user": username}, {"$set": {"image": body.image}})
     return JSONResponse({"error": SUCCESS})
 
 @app.post("/api/img2ascii")
