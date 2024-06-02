@@ -9,6 +9,8 @@ const Profile = (userInfo) => {
     const noImage = "";
     const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = React.useState(noImage);
+    const [profileKey, setProfileKey] = React.useState("");
+    const [profileValue, setProfileValue] = React.useState("");
 
     async function selectImage(formData) {
         let response = await fetch("http://localhost:12345/api/img2ascii", {
@@ -110,6 +112,39 @@ const Profile = (userInfo) => {
                         parse(convert.toHtml(selectedImage))
                     }</pre>
                 </div>
+            </div>
+            <div>
+                <h2>Edit preferences</h2>
+                <p>Remember that only <code>os</code>, <code>ide</code>, and <code>pl</code> are taken into account for matching. Additional preferences may be added for the purposes of searching.</p>
+                <form onSubmit={async (event) => {
+                    event.preventDefault();
+                    if (profileKey === "" || profileValue === "") {
+                        alert("Must input nonempty profile key and profile value.");
+                        return;
+                    }
+                    let postProfileUrl = new URL('http://localhost:12345/api/post_profile');
+                    postProfileUrl.searchParams.append("username", userInfo["userInfo"]["username"]);
+                    postProfileUrl.searchParams.append("access_token", userInfo["userInfo"]["token"]);
+                    postProfileUrl.searchParams.append("profile_key", profileKey);
+                    postProfileUrl.searchParams.append("profile", profileValue);
+                    let response = await fetch(postProfileUrl.toString(), {
+                        method: 'POST',
+                    });
+                    if (response.status !== 200) {
+                        alert("Failed to update profile preference.");
+                        return;
+                    }
+                    let responseData = await response.json();
+                    if (responseData["error"] !== 0) {
+                        alert("Failed to update profile preference.");
+                        return;
+                    }
+                    alert("Successfully updated profile preference.");
+                }}>
+                    <input type="text" placeholder="key" onChange={(event) => {setProfileKey(event.target.value)}} />
+                    <input type="text" placeholder="value" onChange={(event) => {setProfileValue(event.target.value)}} />
+                    <button type="submit" >Update</button>
+                </form>
             </div>
         </div>
     );
