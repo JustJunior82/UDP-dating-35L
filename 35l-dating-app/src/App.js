@@ -13,6 +13,7 @@ import Home from "./pages";
 import About from "./pages/about";
 import Login from "./pages/login";
 import Contact from "./pages/contact";
+import Posts from "./pages/posts";
 import Profile from "./pages/profile";
 import Settings from "./pages/settings";
 import Registration from "./pages/registration";
@@ -50,6 +51,10 @@ function App() {
                 <Route exact path="/" element={<Home isAuth={String(isLoggedIn)} onLogIn={() => setLogin(true)} onLogOut={() => setLogin(false)}/>} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/posts" element={<Posts userInfo={userInfo}
+                    masterPrefList={masterPrefList}
+                    setVisitingProfile={setVisitingProfile}
+                    setVisitingUsername={setVisitingUsername}/>} />
                 <Route path="/login" element={<Login userInfo={userInfo} setUserInfo={setUserInfo} setLogin={(props) => handleLogin(props)}/>} />
                 {/* unaccessable until logged in */}
                 <Route path="/profile" element={<Profile userInfo={userInfo} 
