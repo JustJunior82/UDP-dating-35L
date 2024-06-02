@@ -4,11 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 async function get_profile_data(username) {
     let profileUrl = new URL('http://localhost:12345/api/get_profile');
-    console.log(profileUrl);
-    console.log(username.length);
     profileUrl.searchParams.append("username", username);
-    console.log(username);
-    console.log(profileUrl);
     let response = await fetch(profileUrl.toString(), {
         method: 'GET',
         headers: {
@@ -57,7 +53,7 @@ async function postProfile(username, password, key, value) {
     return true;
 }
 
-function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, visitingUsername, setVisitingUsername }) {
+function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisitingProfile, visitingUsername, setVisitingUsername }) {
     const [found, setFound] = useState(false);
     const [profileData, setProfileData] = useState({ preferences: "", friends: ""});
     const [isFriend, setIsFriend] = useState(false);
@@ -113,7 +109,13 @@ function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, v
     }
 
     function visitingHeader() {
-        if (visitingProfile) {
+        if (!isLoggedIn) {
+            return(<>
+                <button onClick={() => {setVisitingProfile(false); setFound(false); navigate("/posts")}}>Back to Posts</button>
+                <h1>Username: {visitingUsername}</h1>
+            </>);
+        }
+        else if (visitingProfile && isLoggedIn) {
             return (
             <>
                 <button onClick={() => {setVisitingProfile(false); setFound(false)}}>Back to my Profile</button>
@@ -127,6 +129,10 @@ function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, v
 
     function handleFollow(username, follow) {
         // add visitng profile to
+        if (!isLoggedIn) {
+            alert("Please create an account to follow other users");
+            navigate("/registration");
+        }
         get_profile_data(userInfo.username).then(success => {
             if (success) {
                 let newFriends = success.friends;
@@ -152,10 +158,9 @@ function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, v
     }
 
     function followButton() {
-        // let following = is a friend
-        if (!visitingProfile)
+        if (!visitingProfile) {
             return;
-
+        }
         if (!isFriend) {
             return (<button onClick={() => handleFollow(visitingUsername, true)}>Follow</button>);
         }
@@ -170,6 +175,12 @@ function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, v
     }
 
     function friendsList() {
+        function messageButton(item) {
+            if (!isLoggedIn) {
+                return;
+            }
+            return (<><button onClick={() => handleMessageRedirect(item)}>Message</button><br/></>);
+        }
         if (Object.keys(profileData.friends).length !== 0) {
             return(
                 profileData.friends.split(",").map((item, index) => (
@@ -178,8 +189,7 @@ function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, v
                     <br/>
                     <button onClick={() => handleProfileRedirect(item)}>{item}</button>
                     <br/>
-                    <button onClick={() => handleMessageRedirect(item)}>Message</button>
-                    <br/>
+                    {messageButton()}
                     -------------------------
                 </li>)));
         }
@@ -206,7 +216,8 @@ function Profile ({ userInfo, setMessage, visitingProfile, setVisitingProfile, v
                 <br/>
                 {visitingHeader()}
                 {followButton()}
-                <img src={profileData.pfp} alt=""></img>
+                {/* <img src={profileData.pfp} alt=""></img> */}
+                <h3>Name: {profileData.name}</h3>
                 <h3>From: {profileData.state},{profileData.country}</h3>
                 <h3>Joined: {profileData.joinDate}</h3>
                 <h3>Birthday: {profileData.birthday}</h3>

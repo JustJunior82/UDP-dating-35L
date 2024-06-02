@@ -117,6 +117,10 @@ const profileCreation = (props) => {
             <h1>Create your Profile</h1>
             <br/>
             <form onSubmit={props.handleProfileCreation}>
+                <h2>Full Name</h2>
+                <label>
+                    <input type="text" onChange={props.handleNameChange} />
+                </label>
                 <h2>Where do you Live? (optional)</h2>
                 <label>
                     Country:
@@ -151,7 +155,6 @@ const profileCreation = (props) => {
 }
 
 const preferenceSelection = (props) => {
-    let preferences = ["ide", "os", "women", "eggert", "cs35L", "cs33L"];
 
     const handleChange = (event) => {
         const { value, checked } = event.target;
@@ -171,7 +174,7 @@ const preferenceSelection = (props) => {
         <>
             <h1>What things are you interested in (We'll use these to help match you with others)</h1>
             <form>
-                {preferences.map((item, index) => (
+                {props.masterPrefList.map((item, index) => (
                     <div key={index}>
                         <input type="checkbox" name={item} value={item} onChange={handleChange}/>
                         <label>{item}</label><br/>
@@ -182,7 +185,7 @@ const preferenceSelection = (props) => {
     );
 }
 
-function Registration ({ userInfo, setUserInfo }) {
+function Registration ({ userInfo, setUserInfo, masterPrefList }) {
     // General States
     const [part, setPart] = useState(0);
     const navigate = useNavigate();
@@ -199,6 +202,7 @@ function Registration ({ userInfo, setUserInfo }) {
     }
 
     // Profile Creation States
+    const [name, setName] = useState('');
     const [country, setCountry] = useState('');
     const [state, setState] = useState('');
     const [birthday, setBirthday] = useState('');
@@ -223,7 +227,7 @@ function Registration ({ userInfo, setUserInfo }) {
     function handleProfileCreation(event) {
         event.preventDefault();
         console.log("posting profile data");
-        let data = {"country": country, "state": state, "birthday": birthday, "bio": bio, "pfp": image}
+        let data = {"name": name, "country": country, "state": state, "birthday": birthday, "bio": bio, "pfp": image}
         postProfile(userInfo.username, userInfo.password, data).then(success => {
             if (success)
                 setPart(2);
@@ -234,8 +238,12 @@ function Registration ({ userInfo, setUserInfo }) {
         event.preventDefault();
         // console.log("submitting preferences:", preferences)
         postProfile(userInfo.username, userInfo.password, { preferences: preferences }).then(success => {
-            if (success)
+            if (success) {
                 navigate("/profile");
+            }
+            else {
+                alert("Error creating profile");
+            }
         });
     }
 
@@ -254,6 +262,10 @@ function Registration ({ userInfo, setUserInfo }) {
     }
 
     // Profile Creation State Handlers
+    const handleNameChange = (event) => {
+        event.preventDefault();
+        setName(event.target.value);
+    }
     const handleCountryChange = (event) => {
         event.preventDefault();
         setCountry(event.target.value);
@@ -286,7 +298,8 @@ function Registration ({ userInfo, setUserInfo }) {
                 handlePasswordChange: handlePasswordChange});
         case 1:
             return profileCreation(
-                {handleProfileCreation: handleProfileCreation,
+                {handleNameChange: handleNameChange,
+                handleProfileCreation: handleProfileCreation,
                 handleCountryChange: handleCountryChange,
                 handleStateChange: handleStateChange,
                 handleBirthdayChange: handleBirthdayChange,
@@ -295,8 +308,10 @@ function Registration ({ userInfo, setUserInfo }) {
         case 2:
             return preferenceSelection({
                 preferences: preferences,
+                masterPrefList: masterPrefList,
                 setPreferences: setPreferences,
-                handleSubmitPreferences: handleSubmitPreferences});
+                handleSubmitPreferences: handleSubmitPreferences
+            });
     }
 };
  
