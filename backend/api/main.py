@@ -290,6 +290,40 @@ async def get_matches(username: str, access_token: str) -> JSONResponse:
 
     return JSONResponse({"error": SUCCESS, "content": {"count": len(matches), "matches": list(matches)}})
 
+@app.get("/api/get_profile_image")
+async def get_profile_image(username: str, access_token: str) -> JSONResponse:
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    mongo_client = mongo.get_mongo_client()
+    users = mongo_client["UDPDating"]["Users"]
+    me = users.find_one({"user": username})
+    image = me.get("image", "")
+    return JSONResponse({"error": SUCCESS, "content": image})
+
+@app.post("/api/post_profile_image")
+async def post_profile_image(username: str, access_token: str, image: str) -> JSONResponse:
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    mongo_client = mongo.get_mongo_client()
+    users = mongo_client["UDPDating"]["Users"]
+    me = users.find_one({"user": username})
+    # note: this currently assumes that the image field is always valid
+    # ideally, this should probably be checked (e.g. provide img2ascii validation)
+    me["image"] = image
+    return JSONResponse({"error": SUCCESS})
+
 @app.post("/api/img2ascii")
 async def img2ascii(image: UploadFile) -> JSONResponse:
     COLUMNS = 120

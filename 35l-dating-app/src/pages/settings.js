@@ -1,11 +1,13 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import parse from 'html-react-parser';
 import Convert from "ansi-to-html";
 
 import "../App.css"; // for the ascii styling
 
-const Profile = () => {
+const Profile = (userInfo) => {
     const no_image = "";
+    const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = React.useState(no_image);
 
     async function selectImage(formData) {
@@ -28,6 +30,35 @@ const Profile = () => {
     }
 
     let convert = new Convert({newline: true, escapeXML: true});
+
+    let getProfileImageUrl = new URL('http://localhost:12345/api/get_profile_image');
+    getProfileImageUrl.searchParams.append("username", userInfo["userInfo"]["username"]);
+    getProfileImageUrl.searchParams.append("access_token", userInfo["userInfo"]["token"]);
+    fetch(getProfileImageUrl.toString()).then(
+        (response) => {
+            if (response.status !== 200) {
+                // alert("Not logged in!");
+                navigate("/login");
+                return {error: 0, image: no_image};
+            }
+            return response.json(); 
+        }
+    ).then(
+        (responseData) => {
+            if (responseData["error"] !== 0) {
+                alert("Failed to fetch profile image.");
+                return no_image;
+            }
+            return responseData["content"];
+        }
+    ).then(
+        (image) => {
+            console.log(image);
+            selectedImage = image;
+        }
+    ).catch(
+        error => {}
+    )
 
     return (
         <div>

@@ -54,7 +54,7 @@ function App() {
                     setVisitingProfile={setVisitingProfile}
                     friendUsername={friendUsername}
                     setFriendUsername={setFriendUsername}/>} />
-                <Route path="/settings" element={<Settings />} />
+                <Route path="/settings" element={<Settings userInfo={userInfo} />} />
                 <Route path="/messages" element={<Messages userInfo={userInfo}/>} />
                 {/* hidden page only accessible when registering */}
                 <Route path="/registration" element={<Registration userInfo={userInfo} setUserInfo={setUserInfo}/>} />
