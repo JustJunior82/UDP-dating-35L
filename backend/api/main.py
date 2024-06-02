@@ -31,6 +31,7 @@ UNSUPPORTED_IMAGE_FORMAT = 10
 IMAGE_TOO_LARGE = 11
 FAILED_ASCII_MAGIC_ACTION = 12
 FAILED_PIL_ACTION = 13
+MESSAGING_MATCH_BLOCKED = 14
 
 app = FastAPI()
 
@@ -341,6 +342,20 @@ async def send_message(username: str, access_token: str, to: str, message: str):
                 return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
             case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
                 return JSONResponse({"error": FAILED_MONGODB_ACTION})
+
+    # Ensure the users are matched before allowing sending messages
+    mongo_client = mongo.get_mongo_client()
+    matches_collection = mongo_client["UDPDating"]["Matches"]
+    
+    match_criteria = {
+        "$or": [
+            {"from": username, "to": to, "success": True},
+            {"from": to, "to": username, "success": True}
+        ]
+    }
+    match = matches_collection.find_one(match_criteria)
+    if match is None:
+        return JSONResponse({"error": MESSAGING_MATCH_BLOCKED}, status_code=403)
 
     mongo.add_message(username, to, username, message)
     return JSONResponse({"error": SUCCESS})
