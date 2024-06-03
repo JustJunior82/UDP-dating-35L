@@ -1,5 +1,107 @@
+@import url('https://fonts.google.com/specimen/Ubuntu+Mono');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+
 // Override default variables before the import
 $body-bg: #fff;
 
 // Import Bootstrap and its default variables
 @import '~bootstrap/scss/bootstrap.scss';
+
+body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.aboutBody {
+    grid-column: span 1;
+    display: flex;
+    // height: 90vh;
+    width: 100vw;
+    // justify-content: center;
+    // align-items: center;
+}
+
+.left {
+    min-width: 30vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 91vh;
+    flex: 1;
+    background-color: black;
+    flex-direction: column;
+
+    .centered-title-text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 3vw;
+        text-align: center;
+    }
+
+    .centered-author-text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #d3d3d3;
+        font-size: 1vw;
+        text-align: center;
+    }
+}
+
+.right {
+    min-width: 70vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 91vh;
+    flex: 1;
+    background-color: white;
+    flex-direction: column;
+    
+    .right-title-text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: black;
+        font-size: 3vw;
+    }
+}
+
+.accordion {
+    width: 1000px;
+}
+
+.accordion-item {
+    background-color: black;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.accordion-title {
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    padding: 10px 20px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.accordion-content {
+    background-color: white;
+    color: black;
+    width: 100%;
+    border: 1px solid black;
+    padding: 0px 20px;
+}
+
