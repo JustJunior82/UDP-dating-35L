@@ -13,7 +13,7 @@ source venv/bin/activate
 Then, install using `pip`.
 ```sh
 pip install --upgrade pip
-pip install backend/api/requirements.txt
+pip install -r backend/api/requirements.txt
 ```
 
 To install frontend dependencies, use a fairly recently version of Node (e.g. 21.6.1). Then,
