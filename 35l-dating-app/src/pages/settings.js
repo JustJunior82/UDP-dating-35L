@@ -32,10 +32,12 @@ const Profile = (userInfo) => {
 
     let convert = new Convert({newline: true, escapeXML: true});
 
+    let username = userInfo["userInfo"]["username"];
+    let accessToken = userInfo["userInfo"]["token"];
     React.useEffect(() => {
         let getProfileImageUrl = new URL('http://localhost:12345/api/get_profile_image');
-        getProfileImageUrl.searchParams.append("username", userInfo["userInfo"]["username"]);
-        getProfileImageUrl.searchParams.append("access_token", userInfo["userInfo"]["token"]);
+        getProfileImageUrl.searchParams.append("username", username);
+        getProfileImageUrl.searchParams.append("access_token", accessToken);
         fetch(getProfileImageUrl.toString()).then(
             (response) => {
                 if (response.status !== 200) {
@@ -60,7 +62,7 @@ const Profile = (userInfo) => {
         ).catch(
             error => {}
         )},
-        [navigate, userInfo]
+        [navigate]
     );
 
     return (
@@ -141,8 +143,8 @@ const Profile = (userInfo) => {
                     }
                     alert("Successfully updated profile preference.");
                 }}>
-                    <input type="text" placeholder="key" onChange={(event) => {setProfileKey(event.target.value)}} />
-                    <input type="text" placeholder="value" onChange={(event) => {setProfileValue(event.target.value)}} />
+                    <input type="text" placeholder="key" value={profileKey} onChange={(event) => {setProfileKey(event.target.value)}} />
+                    <input type="text" placeholder="value" value={profileValue} onChange={(event) => {setProfileValue(event.target.value)}} />
                     <button type="submit" >Update</button>
                 </form>
             </div>
