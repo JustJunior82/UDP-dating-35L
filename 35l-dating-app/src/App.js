@@ -67,13 +67,16 @@ function App() {
                     setVisitingProfile={setVisitingProfile}
                     visitingUsername={visitingUsername}
                     setVisitingUsername={setVisitingUsername}/>} />
-                <Route path="/settings" element={<Settings />} />
+                <Route path="/settings" element={<Settings userInfo={userInfo} 
+                    setUserInfo={setUserInfo} 
+                    masterPrefList={masterPrefList}
+                    masterInterestsList={masterInterestsList}/>} />
                 <Route path="/messages" element={<Messages userInfo={userInfo}/>} />
                 {/* hidden page only accessible when registering */}
                 <Route path="/registration" element={<Registration userInfo={userInfo} 
-                setUserInfo={setUserInfo} 
-                masterPrefList={masterPrefList}
-                masterInterestsList={masterInterestsList}/>} />
+                    setUserInfo={setUserInfo} 
+                    masterPrefList={masterPrefList}
+                    masterInterestsList={masterInterestsList}/>} />
 
             </Routes>
         </Router>

@@ -39,7 +39,39 @@ async function createUser(email, username, password) {
     }
 }
 
-async function postProfile(username, password, props) {
+async function requestLogin(username, password) {
+    let loginUrl = new URL('http://localhost:12345/api/login');
+    loginUrl.searchParams.append("username", username);
+    loginUrl.searchParams.append("password", password);
+    let response = await fetch(loginUrl.toString(), {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json'
+        },
+    });
+
+    if (response.status !== 200) {
+        alert("Login failed!");
+        return;
+    }
+
+    let json = await response.json();
+    console.log(json);
+
+    switch (json.error) {
+        case 6:
+            alert("Invalid email or password. Please try again");
+            return false;
+        case 3:
+            alert("Database Error, please try again later");
+            return false;
+        default:
+            console.log("Success Logging in ...");
+            return json;
+    }
+}
+
+async function postProfile(username, token, props) {
     let errors = false;
 
     const date = new Date();
@@ -53,9 +85,10 @@ async function postProfile(username, password, props) {
         // }
         let profileURL = new URL('http://localhost:12345/api/post_profile');
         profileURL.searchParams.append("username", username);
-        profileURL.searchParams.append("password", password);
+        profileURL.searchParams.append("access_token", token);
         profileURL.searchParams.append("profile_key", key);
         profileURL.searchParams.append("profile", value);
+        console.log(profileURL);
     
         let response = await fetch(profileURL.toString(), {
             method: 'POST',
@@ -154,7 +187,7 @@ const profileCreation = (props) => {
     );
 }
 
-const preferenceSelection = (props) => {
+function preferenceSelection(props) {
 
     const handleInterestsChange = (event) => {
         const { value, checked } = event.target;
@@ -206,7 +239,7 @@ const preferenceSelection = (props) => {
     return (
         <>
             <h1>What things are you interested in (We'll use these to help match you with others)</h1>
-            <form>
+            <form onSubmit={props.handleSubmitPreferences}>
                 <h3>Interests:</h3>
                 {props.masterInterestsList.map((item, index) => (
                 <div key={index}>
@@ -215,7 +248,7 @@ const preferenceSelection = (props) => {
                 </div>))}
                 <h3>Preferences:</h3>
                 {prefsList()}
-                <button onClick={props.handleSubmitPreferences}>Finish Profile Creation</button>
+                <button type="submit">Finish Profile Creation</button>
             </form>
         </>
     );
@@ -253,11 +286,17 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
         event.preventDefault();
         createUser(email, userInfo.username, userInfo.password).then(success => {
             if (success) {
-                let data = {country: "", state: "", birthday: "", bio: "", pfp: "", interests: "", ide: "", os: "", pl: "", friends: ""}
-                postProfile(userInfo.username, userInfo.password, data).then(success => {
-                    if (success)
-                        setPart(1);
-                });
+                requestLogin(userInfo.username, userInfo.password).then(success => {
+                    if (success) {
+                        setUserInfo({...userInfo, token: success.content["access-token"], expiration: success.content.expired});
+                        let data = {country: "", state: "", birthday: "", bio: "", pfp: "", interests: "", ide: "", os: "", pl: "", friends: ""}
+                        postProfile(userInfo.username, userInfo.token, data).then(success => {
+                            if (success) {
+                                setPart(1);
+                            }
+                        });
+                    }
+                })
             }});
     }
 
@@ -265,15 +304,16 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
         event.preventDefault();
         console.log("posting profile data");
         let data = {"name": name, "country": country, "state": state, "birthday": birthday, "bio": bio, "pfp": image}
-        postProfile(userInfo.username, userInfo.password, data).then(success => {
+        postProfile(userInfo.username, userInfo.token, data).then(success => {
             if (success)
                 setPart(2);
         });
     }
 
-    function handleSubmitPreferences() {
-        // console.log("submitting preferences:", preferences)
-        postProfile(userInfo.username, userInfo.password, { interests: interests, preferences: preferences }).then(success => {
+    function handleSubmitPreferences(event) {
+        event.preventDefault();
+        console.log("submitting preferences:", preferences)
+        postProfile(userInfo.username, userInfo.token, { interests: interests, preferences: preferences }).then(success => {
             if (success) {
                 navigate("/profile");
             }
@@ -344,9 +384,9 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
         case 2:
             return preferenceSelection({
                 preferences: preferences,
-                interests, interests,
+                interests: interests,
                 masterPrefList: masterPrefList,
-                masterInterestsList, masterInterestsList,
+                masterInterestsList: masterInterestsList,
                 setInterests: setInterests,
                 setPreferences: setPreferences,
                 handleSubmitPreferences: handleSubmitPreferences
