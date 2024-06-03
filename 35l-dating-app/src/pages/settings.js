@@ -11,6 +11,7 @@ const Profile = (userInfo) => {
     const [selectedImage, setSelectedImage] = React.useState(noImage);
     const [profileKey, setProfileKey] = React.useState("");
     const [profileValue, setProfileValue] = React.useState("");
+    const [preferenceValue, setPreferenceValue] = React.useState("");
 
     async function selectImage(formData) {
         let response = await fetch("http://localhost:12345/api/img2ascii", {
@@ -116,13 +117,17 @@ const Profile = (userInfo) => {
                 </div>
             </div>
             <div>
-                <h2>Edit preferences</h2>
-                <p>Remember that only <code>os</code>, <code>ide</code>, and <code>pl</code> are taken into account for matching. Additional preferences may be added for the purposes of searching.</p>
+                <h2>Edit profile</h2>
+                <p>Remember that only <code>os</code>, <code>ide</code>, and <code>pl</code> are taken into account for matching. Additional preferences may be added below for the purposes of searching.</p>
                 <form onSubmit={async (event) => {
                     event.preventDefault();
                     if (profileKey === "" || profileValue === "") {
                         alert("Must input nonempty profile key and profile value.");
                         return;
+                    }
+                    if (profileKey === "preferences") {
+                        if (!window.confirm("Warning: you probably meant to update preferences below. Are you sure want to directly edit the preferences list?"))
+                            return;
                     }
                     let postProfileUrl = new URL('http://localhost:12345/api/post_profile');
                     postProfileUrl.searchParams.append("username", userInfo["userInfo"]["username"]);
@@ -133,19 +138,74 @@ const Profile = (userInfo) => {
                         method: 'POST',
                     });
                     if (response.status !== 200) {
-                        alert("Failed to update profile preference.");
+                        alert("Failed to update profile.");
                         return;
                     }
                     let responseData = await response.json();
                     if (responseData["error"] !== 0) {
-                        alert("Failed to update profile preference.");
+                        alert("Failed to update profile.");
                         return;
                     }
-                    alert("Successfully updated profile preference.");
+                    alert("Successfully updated profile.");
                 }}>
                     <input type="text" placeholder="key" value={profileKey} onChange={(event) => {setProfileKey(event.target.value)}} />
                     <input type="text" placeholder="value" value={profileValue} onChange={(event) => {setProfileValue(event.target.value)}} />
                     <button type="submit" >Update</button>
+                </form>
+            </div>
+            <div>
+                <h2>Add preferences</h2>
+                <p>Preferences may be added for the purposes of searching.</p>
+                <form onSubmit={async (event) => {
+                    event.preventDefault();
+
+                    let profileUrl = new URL('http://localhost:12345/api/get_profile');
+                    profileUrl.searchParams.append("username", username);
+                    let currentPreferencesResponse = await fetch(profileUrl.toString(), {
+                        method: 'GET',
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                    });
+                
+                    if (currentPreferencesResponse.status !== 200) {
+                        alert("Fetching Profile failed!");
+                        return;
+                    }
+                
+                    let json = await currentPreferencesResponse.json();
+                    if (json.error !== 0) {
+                        alert("Fetching Profile failed!");
+                        return;
+                    }
+
+                    let currentPreferences = json.profile["preferences"];
+                    if (currentPreferences === "")
+                        currentPreferences = preferenceValue;
+                    else
+                        currentPreferences += "," + preferenceValue;
+                    
+                    let postProfileUrl = new URL('http://localhost:12345/api/post_profile');
+                    postProfileUrl.searchParams.append("username", userInfo["userInfo"]["username"]);
+                    postProfileUrl.searchParams.append("access_token", userInfo["userInfo"]["token"]);
+                    postProfileUrl.searchParams.append("profile_key", "preferences");
+                    postProfileUrl.searchParams.append("profile", currentPreferences);
+                    let response = await fetch(postProfileUrl.toString(), {
+                        method: 'POST',
+                    });
+                    if (response.status !== 200) {
+                        alert("Failed to update preference.");
+                        return;
+                    }
+                    let responseData = await response.json();
+                    if (responseData["error"] !== 0) {
+                        alert("Failed to update preference.");
+                        return;
+                    }
+                    alert("Successfully updated preference.");
+                }}>
+                    <input type="text" placeholder="value" value={preferenceValue} onChange={(event) => {setPreferenceValue(event.target.value)}} />
+                    <button type="submit" >Add</button>
                 </form>
             </div>
         </div>
