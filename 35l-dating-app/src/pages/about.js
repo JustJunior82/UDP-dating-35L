@@ -90,13 +90,13 @@ const About = () => {
                                     {item.title}
                                     {selected === i ? <IoIosArrowDropdownCircle/> : <IoMdArrowDropleftCircle/>}
                                 </div>
-                                <div className='accordion-content'>
-                                    {selected === i && (
-                                        <div>
-                                            {item.content}
-                                        </div>
-                                    )}
-                                </div>
+                                <div className={`accordion-content ${selected === i ? 'accordion-content-visible' : ''}`}>
+            {selected === i && (
+                <div>
+                    {item.content}
+                </div>
+            )}
+        </div>
                             </div>
                         ))}
                 </div>
