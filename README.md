@@ -1,6 +1,12 @@
 # UDP: UDP Dating Protocol
 UCLA COM SCI 35L project.
 
+## Quickstart
+To just run the application, a quickstart script has been provided in the project root directory.
+```sh
+./quickstart.sh
+```
+
 ## Setup
 To setup the app, dependencies need to be installed.
 
