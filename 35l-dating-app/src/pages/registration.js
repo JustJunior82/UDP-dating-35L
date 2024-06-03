@@ -156,13 +156,27 @@ const profileCreation = (props) => {
 
 const preferenceSelection = (props) => {
 
-    const handleChange = (event) => {
+    const handleInterestsChange = (event) => {
         const { value, checked } = event.target;
 
         console.log(`${value} is ${checked}`);
 
         if (checked) {
-            props.setPreferences([...props.preferences, value]);
+            props.setInterests([...props.interests, value]);
+        }
+        else {
+            props.setInterests(props.interests.filter((event) => event !== value));
+        }
+        console.log("new interests:", props.interests);
+    }
+
+    const handlePreferencesChange = (event, key) => {
+        const { value, checked } = event.target;
+
+        console.log(`${key} for ${value} is ${checked}`);
+
+        if (checked) {
+            props.setPreferences([...props.preferences, key + ":" + value]);
         }
         else {
             props.setPreferences(props.preferences.filter((event) => event !== value));
@@ -170,24 +184,46 @@ const preferenceSelection = (props) => {
         console.log("new preferences:", props.preferences);
     }
 
+    function prefsList() {
+        let list = [];
+        for (const [key, value] of Object.entries(props.masterPrefList)) {
+            list.push(<div key={key}>
+                <h5>{key}</h5>
+                {value.map((item, index) => (
+                <div key={index}>
+                    <input type="checkbox" name={item} value={item} onChange={(event) => handlePreferencesChange(event, key)}/>
+                    <label>{item}</label><br/>
+                </div>))}
+            </div>);
+        }
+        return(
+            <>
+            {list}
+            </>
+        );
+    }
+
     return (
         <>
             <h1>What things are you interested in (We'll use these to help match you with others)</h1>
             <form>
-                {props.masterPrefList.map((item, index) => (
-                    <div key={index}>
-                        <input type="checkbox" name={item} value={item} onChange={handleChange}/>
-                        <label>{item}</label><br/>
-                    </div>))}
+                <h3>Interests:</h3>
+                {props.masterInterestsList.map((item, index) => (
+                <div key={index}>
+                    <input type="checkbox" name={item} value={item} onChange={handleInterestsChange}/>
+                    <label>{item}</label><br/>
+                </div>))}
+                <h3>Preferences:</h3>
+                {prefsList()}
                 <button onClick={props.handleSubmitPreferences}>Finish Profile Creation</button>
             </form>
         </>
     );
 }
 
-function Registration ({ userInfo, setUserInfo, masterPrefList }) {
+function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsList }) {
     // General States
-    const [part, setPart] = useState(0);
+    const [part, setPart] = useState(2);
     const navigate = useNavigate();
 
     // Registration States
@@ -211,12 +247,13 @@ function Registration ({ userInfo, setUserInfo, masterPrefList }) {
 
     // Preference Selection States
     const [preferences, setPreferences] = useState([]);
+    const [interests, setInterests] = useState([]);
 
     function handleRegistration(event) {
         event.preventDefault();
         createUser(email, userInfo.username, userInfo.password).then(success => {
             if (success) {
-                let data = {"country": "", "state": "", "birthday": "", "bio": "", "pfp": "", "preferences": "", "friends": ""}
+                let data = {country: "", state: "", birthday: "", bio: "", pfp: "", interests: "", ide: "", os: "", pl: "", friends: ""}
                 postProfile(userInfo.username, userInfo.password, data).then(success => {
                     if (success)
                         setPart(1);
@@ -234,10 +271,9 @@ function Registration ({ userInfo, setUserInfo, masterPrefList }) {
         });
     }
 
-    function handleSubmitPreferences(event) {
-        event.preventDefault();
+    function handleSubmitPreferences() {
         // console.log("submitting preferences:", preferences)
-        postProfile(userInfo.username, userInfo.password, { preferences: preferences }).then(success => {
+        postProfile(userInfo.username, userInfo.password, { interests: interests, preferences: preferences }).then(success => {
             if (success) {
                 navigate("/profile");
             }
@@ -308,7 +344,10 @@ function Registration ({ userInfo, setUserInfo, masterPrefList }) {
         case 2:
             return preferenceSelection({
                 preferences: preferences,
+                interests, interests,
                 masterPrefList: masterPrefList,
+                masterInterestsList, masterInterestsList,
+                setInterests: setInterests,
                 setPreferences: setPreferences,
                 handleSubmitPreferences: handleSubmitPreferences
             });
