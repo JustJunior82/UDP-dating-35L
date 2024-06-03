@@ -22,8 +22,6 @@ async function getMatchingProfiles(preference) {
 
     let json = await response.json();
 
-    console.log("len: ", json.length);
-    console.log(json);
     return json;
 }
 
@@ -35,30 +33,15 @@ function renderPosts(info, handleProfileRedirect) {
         let value;
         for (value of user.profile.preferences.split(",")) {
             if (value !== "") {
-                if (value.startsWith("ide")) {
-                    ide.push(<li key={value}>{value.slice(4,)}</li>);
-                }
-                else if (value.startsWith("os")) {
-                    os.push(<li key={value}>{value.slice(3,)}</li>);
-                }
-                else {
-                    pl.push(<li key={value}>{value.slice(3,)}</li>);
-                }
+                if (value.startsWith("ide")) { ide.push(<li key={value}>{value.slice(4,)}</li>); }
+                else if (value.startsWith("os")) { os.push(<li key={value}>{value.slice(3,)}</li>); }
+                else { pl.push(<li key={value}>{value.slice(3,)}</li>); }
             }
         }
 
-        if (ide.length > MAX_PREFS_DISPLAYED) {
-            ide = ide.slice(0, MAX_PREFS_DISPLAYED);
-            ide.push("...");
-        }
-        if (os.length > MAX_PREFS_DISPLAYED) {
-            os = os.slice(0, MAX_PREFS_DISPLAYED);
-            os.push("...");
-        }
-        if (pl.length > MAX_PREFS_DISPLAYED) {
-            pl = pl.slice(0, MAX_PREFS_DISPLAYED);
-            pl.push("...");
-        }
+        if (ide.length > MAX_PREFS_DISPLAYED) { ide = ide.slice(0, MAX_PREFS_DISPLAYED).push("..."); }
+        if (os.length > MAX_PREFS_DISPLAYED) { os = os.slice(0, MAX_PREFS_DISPLAYED).push("..."); }
+        if (pl.length > MAX_PREFS_DISPLAYED) { pl = pl.slice(0, MAX_PREFS_DISPLAYED).push("..."); }
 
         return (
             <ul>
@@ -71,6 +54,7 @@ function renderPosts(info, handleProfileRedirect) {
             </ul>
         )
     }
+
     return (
     <>
         {info.map((user) => {return (
@@ -79,6 +63,12 @@ function renderPosts(info, handleProfileRedirect) {
                 <h3>{user.user}</h3>
                 <button onClick={() => handleProfileRedirect(user.user)}>View Profile</button>
                 <h4>Member since: {user.profile.joinDate}</h4>
+                <h4>Interests</h4>
+                <ul>
+                    {user.profile.interests.split(",").map((item, index) => (
+                        <li key={index}>{item}</li>
+                    ))}
+                </ul>
                 <h4>Preferences</h4>
                 {prefsList(user)}
                 --------------------------------
