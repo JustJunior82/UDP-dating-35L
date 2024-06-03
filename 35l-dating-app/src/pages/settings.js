@@ -64,7 +64,7 @@ const Profile = (userInfo) => {
         ).catch(
             error => {}
         )},
-        [navigate]
+        [navigate, username, accessToken]
     );
 
     return (
