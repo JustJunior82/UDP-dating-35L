@@ -201,6 +201,37 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
     }
 
+    function prefsList() {
+        let ide = [];
+        let os = [];
+        let pl = [];
+        let value;
+
+        for (value of profileData.preferences.split(",")) {
+            if (value !== "") {
+                if (value.startsWith("ide")) {
+                    ide.push(<li key={value}>{value.slice(4,)}</li>);
+                }
+                else if (value.startsWith("os")) {
+                    os.push(<li key={value}>{value.slice(3,)}</li>);
+                }
+                else {
+                    pl.push(<li key={value}>{value.slice(3,)}</li>);
+                }
+            }
+        }
+        return (
+            <ul>
+                <h4>ide:</h4>
+                {ide}
+                <h4>os:</h4>
+                {os}
+                <h4>pl:</h4>
+                {pl}
+            </ul>
+        )
+    }
+
     if (!found) {
         if (!visitingProfile) {
             requestProfile(userInfo.username);
@@ -210,6 +241,7 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
         return;
     }
+
     else {
         return(
             <> 
@@ -221,12 +253,17 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
                 <h3>From: {profileData.state},{profileData.country}</h3>
                 <h3>Joined: {profileData.joinDate}</h3>
                 <h3>Birthday: {profileData.birthday}</h3>
+                <h3>About Me: {profileData.bio}</h3>
 
-                <h3>My Preferences:</h3>
+                <h3>My Interests:</h3>
                 <ul>
-                    {profileData.preferences.split(",").map((item, index) => (
+                    {profileData.interests.split(",").map((item, index) => (
                     <li key={index}>{item}</li>))}
                 </ul> 
+
+                <h3>My Preferences:</h3>
+                {prefsList()}
+
                 <h3>Friends:</h3>
                 <ul>
                     {friendsList()}

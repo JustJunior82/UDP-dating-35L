@@ -38,7 +38,10 @@ function App() {
     const [visitingProfile, setVisitingProfile] = useState(false);
     const [visitingUsername, setVisitingUsername] = useState("");
 
-    const masterPrefList = ["ide", "os", "women", "eggert", "cs35L", "cs33L"];
+    const masterPrefList = {ide: ["Visual Studio", "Xcode", "Pycharm", "Atom", "Rstudio"], 
+        os: ["MacOS", "Windows", "Linux", "ChromeOS", "iPadOS"], 
+        pl: ["C", "C++", "Python", "Bash", "Lisp", "Javascript", "Java",]};
+    const masterInterestsList = ["men", "women", "reinmann","eggert", "cs35L", "cs33"];
 
     function handleLogin(props) {
         setLogin(true);
@@ -67,12 +70,17 @@ function App() {
                     setVisitingProfile={setVisitingProfile}
                     visitingUsername={visitingUsername}
                     setVisitingUsername={setVisitingUsername}/>} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/messages" element={<ChatPage userInfo={userInfo}/>} />
+                <Route path="/settings" element={<Settings userInfo={userInfo} 
+                    setUserInfo={setUserInfo} 
+                    masterPrefList={masterPrefList}
+                    masterInterestsList={masterInterestsList}/>} />
+                <Route path="/messages" element={<Messages userInfo={userInfo}/>} />
                 {/* hidden page only accessible when registering */}
-                <Route path="/registration" element={<Registration userInfo={userInfo} setUserInfo={setUserInfo} masterPrefList={masterPrefList}/>} />
-                {/* testing */}
-                <Route path="/test" element={ChatPage} />
+                <Route path="/registration" element={<Registration userInfo={userInfo} 
+                    setUserInfo={setUserInfo} 
+                    masterPrefList={masterPrefList}
+                    masterInterestsList={masterInterestsList}/>} />
+
             </Routes>
         </Router>
     );
