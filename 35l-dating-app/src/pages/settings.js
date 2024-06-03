@@ -11,7 +11,8 @@ const Profile = (userInfo) => {
     const [selectedImage, setSelectedImage] = React.useState(noImage);
     const [profileKey, setProfileKey] = React.useState("");
     const [profileValue, setProfileValue] = React.useState("");
-    const [preferenceValue, setPreferenceValue] = React.useState("");
+    const [addPreferenceValue, setAddPreferenceValue] = React.useState("");
+    const [removePreferenceValue, setRemovePreferenceValue] = React.useState("");
 
     async function selectImage(formData) {
         let response = await fetch("http://localhost:12345/api/img2ascii", {
@@ -180,10 +181,14 @@ const Profile = (userInfo) => {
                     }
 
                     let currentPreferences = json.profile["preferences"];
+                    if (currentPreferences.includes(addPreferenceValue)) {
+                        alert("Preference is already included.");
+                        return;
+                    }
                     if (currentPreferences === "")
-                        currentPreferences = preferenceValue;
+                        currentPreferences = addPreferenceValue;
                     else
-                        currentPreferences += "," + preferenceValue;
+                        currentPreferences += "," + addPreferenceValue;
                     
                     let postProfileUrl = new URL('http://localhost:12345/api/post_profile');
                     postProfileUrl.searchParams.append("username", userInfo["userInfo"]["username"]);
@@ -204,8 +209,63 @@ const Profile = (userInfo) => {
                     }
                     alert("Successfully updated preference.");
                 }}>
-                    <input type="text" placeholder="value" value={preferenceValue} onChange={(event) => {setPreferenceValue(event.target.value)}} />
+                    <input type="text" placeholder="value" value={addPreferenceValue} onChange={(event) => {setAddPreferenceValue(event.target.value)}} />
                     <button type="submit" >Add</button>
+                </form>
+            </div>
+            <div>
+            <h2>Remove preferences</h2>
+                <form onSubmit={async (event) => {
+                    event.preventDefault();
+
+                    let profileUrl = new URL('http://localhost:12345/api/get_profile');
+                    profileUrl.searchParams.append("username", username);
+                    let currentPreferencesResponse = await fetch(profileUrl.toString(), {
+                        method: 'GET',
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                    });
+                
+                    if (currentPreferencesResponse.status !== 200) {
+                        alert("Fetching Profile failed!");
+                        return;
+                    }
+                
+                    let json = await currentPreferencesResponse.json();
+                    if (json.error !== 0) {
+                        alert("Fetching Profile failed!");
+                        return;
+                    }
+
+                    let currentPreferences = json.profile["preferences"];
+                    if (!currentPreferences.includes(removePreferenceValue)) {
+                        alert("Preference is not included.");
+                        return;
+                    }
+                    currentPreferences = currentPreferences.replace(removePreferenceValue, "");
+                    
+                    let postProfileUrl = new URL('http://localhost:12345/api/post_profile');
+                    postProfileUrl.searchParams.append("username", userInfo["userInfo"]["username"]);
+                    postProfileUrl.searchParams.append("access_token", userInfo["userInfo"]["token"]);
+                    postProfileUrl.searchParams.append("profile_key", "preferences");
+                    postProfileUrl.searchParams.append("profile", currentPreferences);
+                    let response = await fetch(postProfileUrl.toString(), {
+                        method: 'POST',
+                    });
+                    if (response.status !== 200) {
+                        alert("Failed to update preference.");
+                        return;
+                    }
+                    let responseData = await response.json();
+                    if (responseData["error"] !== 0) {
+                        alert("Failed to update preference.");
+                        return;
+                    }
+                    alert("Successfully updated preference.");
+                }}>
+                    <input type="text" placeholder="value" value={removePreferenceValue} onChange={(event) => {setRemovePreferenceValue(event.target.value)}} />
+                    <button type="submit" >Remove</button>
                 </form>
             </div>
         </div>
