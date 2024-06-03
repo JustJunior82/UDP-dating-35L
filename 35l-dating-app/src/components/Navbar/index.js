@@ -50,6 +50,9 @@ const DefaultNavBar = () => {
                     <NavLink to="/posts" >
                         Posts
                     </NavLink>
+                    <NavLink to="/messages" >
+                        Chat
+                    </NavLink>
                     <NavLink to="/login" >
                         Login
                     </NavLink>

@@ -3,7 +3,7 @@ import './home.scss'
 import Sidebar from '../components/Chat/Sidebar'
 import Chat from '../components/Chat/Chat'
 
-const HomeTest = () => {
+const ChatPage = () => {
   return (
     <div className='home'>
       <div className='container'>
@@ -14,4 +14,4 @@ const HomeTest = () => {
   )
 }
 
-export default HomeTest
+export default ChatPage

@@ -19,7 +19,7 @@ import Settings from "./pages/settings";
 import Registration from "./pages/registration";
 import Messages from "./pages/messages";
 
-import HomeTest from "./pages/HomeTest";
+import ChatPage from "./pages/ChatPage";
 
 // import PrivateRoute from "./pages/PrivateRoute";
 
@@ -47,7 +47,33 @@ function App() {
 
 
     return (
-        <HomeTest />
+        <Router>
+            <Navbar isLoggedIn={isLoggedIn}/>
+            <Routes>
+                <Route exact path="/" element={<Home isAuth={String(isLoggedIn)} onLogIn={() => setLogin(true)} onLogOut={() => setLogin(false)}/>} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/posts" element={<Posts userInfo={userInfo}
+                    masterPrefList={masterPrefList}
+                    setVisitingProfile={setVisitingProfile}
+                    setVisitingUsername={setVisitingUsername}/>} />
+                <Route path="/login" element={<Login userInfo={userInfo} setUserInfo={setUserInfo} setLogin={(props) => handleLogin(props)}/>} />
+                {/* unaccessable until logged in */}
+                <Route path="/profile" element={<Profile userInfo={userInfo} 
+                    isLoggedIn={isLoggedIn}
+                    setMessage={(friendUsername) => setUserInfo({ ...userInfo, message: friendUsername })} 
+                    visitingProfile={visitingProfile}
+                    setVisitingProfile={setVisitingProfile}
+                    visitingUsername={visitingUsername}
+                    setVisitingUsername={setVisitingUsername}/>} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/messages" element={<ChatPage userInfo={userInfo}/>} />
+                {/* hidden page only accessible when registering */}
+                <Route path="/registration" element={<Registration userInfo={userInfo} setUserInfo={setUserInfo} masterPrefList={masterPrefList}/>} />
+                {/* testing */}
+                <Route path="/test" element={ChatPage} />
+            </Routes>
+        </Router>
     );
 };
  
