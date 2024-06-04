@@ -56,7 +56,45 @@ function preferenceUpdate(props) {
             </>
         );
     }
-    
+
+    return (
+        <>
+            <h1>What things are you interested in (We'll use these to help match you with others)</h1>
+            <form onSubmit={props.handleSubmitPreferences}>
+                <h3>Interests:</h3>
+                {props.masterInterestsList.map((item, index) => (
+                <div key={index}>
+                    <input type="checkbox" name={item} value={item} onChange={handleInterestsChange}/>
+                    <label>{item}</label><br/>
+                </div>))}
+                <h3>Preferences:</h3>
+                {prefsList()}
+                <button type="submit">Update Preferences</button>
+            </form>
+        </>
+    );
+}
+
+function Settings({ userInfo, setUserInfo, masterPrefList, masterInterestsList }) {
+    const [preferences, setPreferences] = useState([]);
+    const [interests, setInterests] = useState([]);
+    const noImage = "";
+    const navigate = useNavigate();
+    const [selectedImage, setSelectedImage] = React.useState(noImage);
+
+    function handleSubmitPreferences(event) {
+        event.preventDefault();
+        console.log("submitting preferences:", preferences)
+        postProfile(userInfo.username, userInfo.token, { interests: interests, preferences: preferences }).then(success => {
+            if (success) {
+                alert("Success updating profile");
+            }
+            else {
+                alert("Error creating profile");
+            }
+        });
+    }
+
     async function selectImage(formData) {
         let response = await fetch("http://localhost:12345/api/img2ascii", {
             method: 'POST',
@@ -77,8 +115,8 @@ function preferenceUpdate(props) {
 
     let convert = new Convert({newline: true, escapeXML: true});
 
-    let username = userInfo["userInfo"]["username"];
-    let accessToken = userInfo["userInfo"]["token"];
+    let username = userInfo["username"];
+    let accessToken = userInfo["token"];
     React.useEffect(() => {
         let getProfileImageUrl = new URL('http://localhost:12345/api/get_profile_image');
         getProfileImageUrl.searchParams.append("username", username);
@@ -112,44 +150,6 @@ function preferenceUpdate(props) {
 
     return (
         <>
-            <h1>What things are you interested in (We'll use these to help match you with others)</h1>
-            <form onSubmit={props.handleSubmitPreferences}>
-                <h3>Interests:</h3>
-                {props.masterInterestsList.map((item, index) => (
-                <div key={index}>
-                    <input type="checkbox" name={item} value={item} onChange={handleInterestsChange}/>
-                    <label>{item}</label><br/>
-                </div>))}
-                <h3>Preferences:</h3>
-                {prefsList()}
-                <button type="submit">Update Preferences</button>
-            </form>
-        </>
-    );
-}
-
-function Settings({ userInfo, masterPrefList, masterInterestsList }) {
-    const [preferences, setPreferences] = useState([]);
-    const [interests, setInterests] = useState([]);
-    const noImage = "";
-    const navigate = useNavigate();
-    const [selectedImage, setSelectedImage] = React.useState(noImage);
-
-    function handleSubmitPreferences(event) {
-        event.preventDefault();
-        console.log("submitting preferences:", preferences)
-        postProfile(userInfo.username, userInfo.token, { interests: interests, preferences: preferences }).then(success => {
-            if (success) {
-                alert("Success updating profile");
-            }
-            else {
-                alert("Error creating profile");
-            }
-        });
-    }
-
-    return (
-        <>
             <h1>User's Settings</h1>
             <div>
                 <h2>
@@ -159,8 +159,8 @@ function Settings({ userInfo, masterPrefList, masterInterestsList }) {
                     <form encType="multipart/form-data" method="POST" onSubmit={async (event) => {
                             event.preventDefault();
                             let postProfileImageUrl = new URL('http://localhost:12345/api/post_profile_image');
-                            postProfileImageUrl.searchParams.append("username", userInfo["userInfo"]["username"]);
-                            postProfileImageUrl.searchParams.append("access_token", userInfo["userInfo"]["token"]);
+                            postProfileImageUrl.searchParams.append("username", username);
+                            postProfileImageUrl.searchParams.append("access_token", accessToken);
                             let response = await fetch(postProfileImageUrl.toString(), {
                                 method: 'POST',
                                 headers: {
