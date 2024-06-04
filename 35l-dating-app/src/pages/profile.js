@@ -1,6 +1,11 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+import resolvePotentialMatch from "../components/API/resolvePotentialMatch";
+import getPotentialMatches from "../components/API/getPotentialMatches";
+import getMatches from "../components/API/getMatches";
+import getOutMatches from "../components/API/getOutMatches";
 
 async function get_profile_data(username) {
     let profileUrl = new URL('http://localhost:12345/api/get_profile');
@@ -54,50 +59,56 @@ async function postProfile(username, password, key, value) {
 }
 
 function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisitingProfile, visitingUsername, setVisitingUsername }) {
-    const [found, setFound] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [profileData, setProfileData] = useState({ preferences: "", friends: ""});
-    const [isFriend, setIsFriend] = useState(false);
+    const [isMatch, setIsMatch] = useState(false);
+    const [matches, setMatches] = useState([]);
+    const [outMatches, setOutMatches] = useState([]);
     const navigate = useNavigate();
 
-    function requestProfile(username) {
+    const requestProfile = (username) => {
         get_profile_data(username).then(success => {
             if (success) {
-                setFound(true);
                 setProfileData(success);
-                console.log("checking if " + username + "is a friend of" + userInfo.username);
-                console.log(success);
-                get_profile_data(userInfo.username).then(s => {
-                    if (s)  {
-                        if (visitingProfile && s.friends.split(",").includes(username)) {
-                            setIsFriend(true);
+                // if not visiting then also get list of matches to display
+                if (!visitingProfile) {
+                    getMatches(userInfo.username, userInfo.token).then(success => {
+                        if (success) {
+                            setMatches(success.content.matches);
                         }
-                        else {
-                            setIsFriend(false);
+                    })
+                    getOutMatches(userInfo.username, userInfo.token).then(success => {
+                        if (success) {
+                            console.log(success.content.out_matches);
+                            setOutMatches(success.content.out_matches);
                         }
-                    }
-                    else {
-                        setIsFriend(false);
-                    }
-                })
-                
+                    })
+                }
+                else if (matches.includes(username)) { // check if is match for match button display
+                    setIsMatch(true);
+                }
+                else {
+                    setIsMatch(false);
+                }
+                setLoading(false);
             }
         });
     }
 
-    // error from redirecting to another proifle from friend proifle
+
     function handleProfileRedirect(visitingUsername) {
         // redirect to profile page of friend
         if (visitingUsername === userInfo.username) {
             setVisitingProfile(false);
             setVisitingUsername("");
             setProfileData({ preferences: "", friends: "" });
-            setFound(false);
+            setLoading(true);
         } 
         else {
             setVisitingProfile(true);
             setVisitingUsername(visitingUsername);
             setProfileData({ preferences: "", friends: "" });
-            setFound(false);
+            setLoading(true);
         }
     }
 
@@ -108,17 +119,17 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         navigate("/messages");
     }
 
-    function visitingHeader() {
+    const VisitingHeader = () => {
         if (!isLoggedIn) {
             return(<>
-                <button onClick={() => {setVisitingProfile(false); setFound(false); navigate("/posts")}}>Back to Posts</button>
+                <button onClick={() => {setVisitingProfile(false); setLoading(true); navigate("/posts")}}>Back to Posts</button>
                 <h1>Username: {visitingUsername}</h1>
             </>);
         }
         else if (visitingProfile && isLoggedIn) {
             return (
             <>
-                <button onClick={() => {setVisitingProfile(false); setFound(false)}}>Back to my Profile</button>
+                <button onClick={() => {setVisitingProfile(false); setLoading(true);}}>Back to my Profile</button>
                 <h1> Username: {visitingUsername}</h1>
             </>);
         }
@@ -127,61 +138,44 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
     }
 
-    function handleFollow(username, follow) {
-        // add visitng profile to
+    function handleMatch(username, match) {
         if (!isLoggedIn) {
-            alert("Please create an account to follow other users");
+            alert("Please create an account to match with other users");
             navigate("/registration");
         }
-        get_profile_data(userInfo.username).then(success => {
-            if (success) {
-                let newFriends = success.friends;
 
-                if (follow) {
-                    newFriends = newFriends + "," + username;
-                }
-                else {
-                    newFriends = newFriends.split(",").filter((event) => event !== username).join(",");
-                }
-                
-                console.log("newfirends are: ", newFriends);
-                postProfile(userInfo.username, userInfo.password, "friends", newFriends).then(success => {
-                    if (success) {
-                        setIsFriend(follow);
-                    }
-                    else {
-                        alert("Following " + username + " failed, please try again later");
-                    }
-                })
+        resolvePotentialMatch(userInfo.username, userInfo.token, username, match).then(success => {
+            setOutMatches(outMatches => [...outMatches, username]);
+            if (success === 0 && match) {
+                alert("Sent Match Request to " + username);
             }
-        });
+            else if (success === 9) {
+                alert("Match Request already sent to " + username + "\nWait to see if they accept!");
+            }
+            else {
+                alert("Sending Match request to " + username + " failed, please try again later");
+            }
+        })
     }
 
     function followButton() {
         if (!visitingProfile) {
             return;
         }
-        if (!isFriend) {
-            return (<button onClick={() => handleFollow(visitingUsername, true)}>Follow</button>);
+        if (outMatches.includes(visitingUsername)) {
+            return (<button>Match Request Pending</button>);
+        }
+        else if (!isMatch) {
+            return (<button onClick={() => handleMatch(visitingUsername, true)}>Match</button>);
         }
         else {
-            return (
-                <>
-                    <button>Following</button>
-                    <button onClick={() => handleFollow(visitingUsername, false)}>Unfollow</button>
-                </>
-            );
+            return (<button>Matched</button>);
         }
     }
 
-    function friendsList() {
-        if (!("friends" in profileData)) {
-            if (visitingProfile) {
-                return(<p>{visitingUsername} has no friends yet. Message them to start chatting!</p>)
-            }
-            else {
-                return(<p>Go to the posts page to find some new friends!</p>);
-            }
+    function matchesList() {
+        if (visitingProfile) {
+            return;
         }
         function messageButton(item) {
             if (!isLoggedIn) {
@@ -189,23 +183,19 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             }
             return (<><button onClick={() => handleMessageRedirect(item)}>Message</button><br/></>);
         }
-        if (Object.keys(profileData.friends).length !== 0) {
+        if (matches.length !== 0) {
             return(
-                profileData.friends.split(",").map((item, index) => (
+                matches.map((item, index) => (
                 <li key={index}>
                     -------------------------
                     <br/>
                     <button onClick={() => handleProfileRedirect(item)}>{item}</button>
                     <br/>
                     {messageButton()}
-                    -------------------------
                 </li>)));
         }
-        else if (visitingProfile) {
-            return(<p>{visitingUsername} has no friends yet. Message them to start chatting!</p>)
-        }
         else {
-            return(<p>Go to the posts page to find some new friends!</p>);
+            return(<p>Go to the posts page to find some new matches!</p>);
         }
     }
 
@@ -262,23 +252,21 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             <li key={index}>{item}</li>)));
     }
 
-    if (!found) {
-        if (!visitingProfile) {
-            requestProfile(userInfo.username);
+    useEffect(() => {
+        if (loading) {
+            const username = visitingProfile ? visitingUsername : userInfo.username;
+            requestProfile(username);
         }
-        else {
-            requestProfile(visitingUsername);
-        }
+    }, [loading, visitingProfile, visitingUsername, userInfo.username]);
+
+    if (loading) {
         return;
     }
-
     else {
         return(
             <> 
-                <br/>
-                {visitingHeader()}
+                <VisitingHeader/>
                 {followButton()}
-                {/* <img src={profileData.pfp} alt=""></img> */}
                 <h3>Name: {profileData.name}</h3>
                 <h3>From: {profileData.state},{profileData.country}</h3>
                 <h3>Joined: {profileData.joinDate}</h3>
@@ -288,16 +276,14 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
                 <h3>My Interests:</h3>
                 <ul>
                     {interestsList()}
-                    {/* {profileData.interests.split(",").map((item, index) => (
-                        <li key={index}>{item}</li>))} */}
                 </ul> 
 
                 <h3>My Preferences:</h3>
                 {prefsList()}
 
-                <h3>Friends:</h3>
+                <h3>Matches:</h3>
                 <ul>
-                    {friendsList()}
+                    {matchesList()}
                 </ul>
             </>);
     }
