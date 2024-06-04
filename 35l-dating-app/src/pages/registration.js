@@ -56,7 +56,7 @@ async function requestLogin(username, password) {
     }
 
     let json = await response.json();
-    console.log(json);
+    // console.log(json);
 
     switch (json.error) {
         case 6:
@@ -73,10 +73,6 @@ async function requestLogin(username, password) {
 
 async function postProfile(username, token, props) {
     let errors = false;
-
-    const date = new Date();
-    let joinDate = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0");
-    props = {...props, joinDate: joinDate};
 
     for (const [key, value] of Object.entries(props)) {
         // if (value === '') {
@@ -254,9 +250,9 @@ function preferenceSelection(props) {
     );
 }
 
-function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsList }) {
+function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsList, setLogin }) {
     // General States
-    const [part, setPart] = useState(2);
+    const [part, setPart] = useState(0);
     const navigate = useNavigate();
 
     // Registration States
@@ -286,14 +282,26 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
         event.preventDefault();
         createUser(email, userInfo.username, userInfo.password).then(success => {
             if (success) {
+                setUserInfo({...userInfo, token: "", expiration: "", message: "default"});
+                console.log("user creation success", success);
                 requestLogin(userInfo.username, userInfo.password).then(success => {
+                    console.log("user login success", success);
                     if (success) {
-                        setUserInfo({...userInfo, token: success.content["access-token"], expiration: success.content.expired});
-                        let data = {country: "", state: "", birthday: "", bio: "", pfp: "", interests: "", ide: "", os: "", pl: "", friends: ""}
-                        postProfile(userInfo.username, userInfo.token, data).then(success => {
+                        console.log(success.content["access-token"]);
+                        setLogin({username: userInfo.username, password: userInfo.password, token: success.content["access-token"], expiration: success.content.expired});
+                        const date = new Date();
+                        let joinDate = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0");
+                        let data = {joinDate: joinDate, country: "", state: "", birthday: "", bio: "", pfp: "", interests: "", ide: "", os: "", pl: "", friends: ""}
+                        
+                        console.log("username", userInfo.username);
+                        console.log("token", userInfo.token);
+                        console.log("data", data);
+                        postProfile(userInfo.username, success.content["access-token"], data).then(success => {
                             if (success) {
+                                console.log("user base profile creation success", success);
                                 setPart(1);
                             }
+                            
                         });
                     }
                 })

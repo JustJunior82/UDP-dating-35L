@@ -175,6 +175,14 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     }
 
     function friendsList() {
+        if (!("friends" in profileData)) {
+            if (visitingProfile) {
+                return(<p>{visitingUsername} has no friends yet. Message them to start chatting!</p>)
+            }
+            else {
+                return(<p>Go to the posts page to find some new friends!</p>);
+            }
+        }
         function messageButton(item) {
             if (!isLoggedIn) {
                 return;
@@ -202,6 +210,14 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     }
 
     function prefsList() {
+        if (!("preferences" in profileData)) {
+            if (visitingProfile) {
+                return (<ul><li key="none">None</li></ul>);
+            }
+            else {
+                return (<ul><li key="none">Add to your preferences list on the Settings page</li></ul>);
+            }
+        }
         let ide = [];
         let os = [];
         let pl = [];
@@ -232,6 +248,20 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         )
     }
 
+    function interestsList() {
+        if (!("interests" in profileData)) {
+            if (visitingProfile) {
+                return (<li key="none">None</li>);
+            }
+            else {
+                return (<li key="none">Add to your interests list on the Settings page</li>)
+            }
+        }
+        return (
+            profileData.interests.split(",").map((item, index) => (
+            <li key={index}>{item}</li>)));
+    }
+
     if (!found) {
         if (!visitingProfile) {
             requestProfile(userInfo.username);
@@ -257,8 +287,9 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
 
                 <h3>My Interests:</h3>
                 <ul>
-                    {profileData.interests.split(",").map((item, index) => (
-                    <li key={index}>{item}</li>))}
+                    {interestsList()}
+                    {/* {profileData.interests.split(",").map((item, index) => (
+                        <li key={index}>{item}</li>))} */}
                 </ul> 
 
                 <h3>My Preferences:</h3>
