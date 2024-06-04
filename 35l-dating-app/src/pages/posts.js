@@ -7,6 +7,10 @@ const MAX_NUM_POSTS = 100;
 const MAX_PREFS_DISPLAYED = 2;
 
 function renderPosts(info, handleProfileRedirect) {
+    function isPrivate(user) {
+        return(("public" in user) && user.public === "false");
+    }
+
     function prefsList(user) {
         if (!("preferences" in user.profile)) {
             return(<ul><li key="none">None</li></ul>);
@@ -38,6 +42,7 @@ function renderPosts(info, handleProfileRedirect) {
             </ul>
         )
     }
+
     function interestsList(user) {
         if (!("interests" in user.profile)) {
             return (<li key="none">None</li>)
@@ -45,6 +50,22 @@ function renderPosts(info, handleProfileRedirect) {
         return (
             user.profile.interests.split(",").map((item, index) => (
             <li key={index}>{item}</li>)));
+    }
+
+    const PrivatePortion = (props) => {
+        if (isPrivate(props.user.profile)) {
+            return (<p>This Profile is private <br/>(limited information will be displayed)</p>)
+        }
+        else {
+            return(<>
+                <h4>Interests</h4>
+                <ul>
+                {interestsList(props.user)}
+                </ul>
+                <h4>Preferences</h4>
+                {prefsList(props.user)}
+            </>);
+        }
     }
 
     return (
@@ -55,13 +76,7 @@ function renderPosts(info, handleProfileRedirect) {
                 <h3>{user.user}</h3>
                 <button onClick={() => handleProfileRedirect(user.user)}>View Profile</button>
                 <h4>Member since: {user.profile.joinDate}</h4>
-                <h4>Interests</h4>
-                <ul>
-                {interestsList(user)}
-                </ul>
-                <h4>Preferences</h4>
-                {prefsList(user)}
-                --------------------------------
+                <PrivatePortion user={user}/>
             </div>);
         })}
     </>);
@@ -141,8 +156,6 @@ function Posts({ userInfo, masterPrefList, setVisitingProfile, setVisitingUserna
             if (success) {
                 // preventing user from seeing their own profile
                 success = success.filter((event) => event.user !== userInfo.username);
-                // filtering out private profiles
-                success = success.filter((event) => (!("public" in event.profile) || event.profile.public !== false));
                 setPosts(success.slice(0,MAX_NUM_POSTS));
             }
         })

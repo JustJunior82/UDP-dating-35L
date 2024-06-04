@@ -69,8 +69,8 @@ const profileCreation = (props) => {
                 </label>
                 <br/>
                 <label>
-                    Profile Picture (optional):
-                    <input type="file" onChange={props.handleImageChange} accept="image/png, image/jpeg"/>
+                    Private Profile (selecting this option will restrict certain users from viewing your profile):
+                    <input type="checkbox" value={props.publicProfile} onChange={props.handlePublicProfileChange}/>
                 </label>
                 <br/>
                 <button type="submit">Next</button>
@@ -169,7 +169,7 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
     const [state, setState] = useState('');
     const [birthday, setBirthday] = useState('');
     const [bio, setBio] = useState('');
-    const [image, setImage] = useState('');
+    const [publicProfile, setPublicProfile] = useState(false);
 
     // Preference Selection States
     const [preferences, setPreferences] = useState([]);
@@ -208,7 +208,7 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
     function handleProfileCreation(event) {
         event.preventDefault();
         console.log("posting profile data");
-        let data = {"name": name, "country": country, "state": state, "birthday": birthday, "bio": bio, "pfp": image}
+        let data = {"name": name, "country": country, "state": state, "birthday": birthday, "bio": bio, "public": publicProfile}
         postProfile(userInfo.username, userInfo.token, data).then(success => {
             if (success)
                 setPart(2);
@@ -263,9 +263,8 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
         event.preventDefault();
         setBio(event.target.value);
     }
-    const handleImageChange = (event) => {
-        event.preventDefault();
-        setImage(event.target.files[0]);
+    const handlePublicProfileChange = () => {
+        setPublicProfile(!publicProfile);
     }
 
     switch (part) {
@@ -285,7 +284,8 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
                 handleStateChange: handleStateChange,
                 handleBirthdayChange: handleBirthdayChange,
                 handleBioChange: handleBioChange,
-                handleImageChange: handleImageChange});
+                publicProfile: publicProfile,
+                handlePublicProfileChange: handlePublicProfileChange});
         case 2:
             return preferenceSelection({
                 preferences: preferences,

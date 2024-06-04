@@ -28,10 +28,10 @@ import ChatPage from "./pages/ChatPage";
 function App() {
     const [isLoggedIn, setLogin] = useState(false);
     const [userInfo, setUserInfo] = useState({
-        username: "testuser",
-        password: "1234",
-        token: "28ed3376-bede-4f49-a6b1-e8add26babff",
-        expiration: "1717486084.96674",
+        username: "",
+        password: "",
+        token: "",
+        expiration: "",
         message: "default",
     });
     // const [userProfile, setUserProfile] = useState({});

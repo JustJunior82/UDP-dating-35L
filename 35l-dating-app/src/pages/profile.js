@@ -59,6 +59,11 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     const [isFriend, setIsFriend] = useState(false);
     const navigate = useNavigate();
 
+
+    function isPrivate() {
+        return(("public" in profileData) && profileData.public === "false");
+    }
+
     function requestProfile(username) {
         get_profile_data(username).then(success => {
             if (success) {
@@ -174,48 +179,71 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
     }
 
-    function friendsList() {
+    const FriendsList = () => {
         if (!("friends" in profileData)) {
             if (visitingProfile) {
-                return(<p>{visitingUsername} has no friends yet. Message them to start chatting!</p>)
+                return(<>
+                <h3>Friends:</h3>
+                <ul><li>{visitingUsername} has no friends yet. Message them to start chatting!</li></ul>
+                </>);
             }
             else {
-                return(<p>Go to the posts page to find some new friends!</p>);
+                return(<>
+                    <h3>Friends:</h3>
+                    <ul><li>Go to the posts page to find some new friends!</li></ul>
+                    </>);
             }
         }
-        function messageButton(item) {
+
+        const MessageButton = (item) => {
             if (!isLoggedIn) {
                 return;
             }
-            return (<><button onClick={() => handleMessageRedirect(item)}>Message</button><br/></>);
+            return (<button onClick={() => handleMessageRedirect(item)}>Message</button>);
         }
+
         if (Object.keys(profileData.friends).length !== 0) {
             return(
-                profileData.friends.split(",").map((item, index) => (
-                <li key={index}>
-                    -------------------------
-                    <br/>
-                    <button onClick={() => handleProfileRedirect(item)}>{item}</button>
-                    <br/>
-                    {messageButton()}
-                    -------------------------
-                </li>)));
+                <>
+                    <h3>Friends:</h3>
+                    <ul>
+                        {profileData.friends.split(",").map((item, index) => (
+                        <li key={index}>
+                            -------------------------
+                            <br/>
+                            <button onClick={() => handleProfileRedirect(item)}>{item}</button>
+                            <br/>
+                            <MessageButton/>
+                        </li>))}
+                    </ul>
+                    </>
+                );
         }
         else if (visitingProfile) {
-            return(<p>{visitingUsername} has no friends yet. Message them to start chatting!</p>)
+            return(<>
+            <h3>Friends:</h3>
+            <ul><li>{visitingUsername} has no friends yet. Message them to start chatting!</li></ul>
+            </>);
         }
         else {
-            return(<p>Go to the posts page to find some new friends!</p>);
+            return(<>
+                <h3>Friends:</h3>
+                <ul><li>Go to the posts page to find some new friends!</li></ul>
+                </>);
         }
     }
 
-    function prefsList() {
+    const PrefsList = () => {
         if (!("preferences" in profileData)) {
             if (visitingProfile) {
-                return (<ul><li key="none">None</li></ul>);
+                return (<>
+                    <h3>My Preferences:</h3><ul><li key="none">None</li></ul>
+                </>);
             }
             else {
-                return (<ul><li key="none">Add to your preferences list on the Settings page</li></ul>);
+                return (<>
+                    <h3>My Preferences:</h3><ul><li key="none">Add to your preferences list on the Settings page</li></ul>
+                </>);
             }
         }
         let ide = [];
@@ -237,6 +265,8 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             }
         }
         return (
+            <>
+            <h3>My Preferences:</h3>
             <ul>
                 <h4>ide:</h4>
                 {ide}
@@ -245,21 +275,47 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
                 <h4>pl:</h4>
                 {pl}
             </ul>
-        )
+            </>);
     }
 
-    function interestsList() {
+    const InterestsList = () => {
         if (!("interests" in profileData)) {
             if (visitingProfile) {
-                return (<li key="none">None</li>);
+                return (<>
+                    <h3>My Interests:</h3>
+                    <ul> <li key="none">None</li></ul>
+                </>);
             }
             else {
-                return (<li key="none">Add to your interests list on the Settings page</li>)
+                return (<>
+                    <h3>My Interests:</h3>
+                    <ul><li key="none">Add to your interests list on the Settings page</li></ul>
+                </>)
             }
         }
-        return (
-            profileData.interests.split(",").map((item, index) => (
-            <li key={index}>{item}</li>)));
+        return (<>
+            <h3>My Interests:</h3>
+            <ul>{profileData.interests.split(",").map((item, index) => (<li key={index}>{item}</li>))}</ul>
+            </>);
+    }
+
+    const PrivatePortion = () => {
+        if (isPrivate() && visitingProfile) {
+            return(<p>This Profile is private, follow {visitingUsername} to see their full profile</p>);
+        }
+        else {
+            return(<>
+                <h3>Name: {profileData.name}</h3>
+                <h3>From: {profileData.state},{profileData.country}</h3>
+                <h3>Joined: {profileData.joinDate}</h3>
+                <h3>Birthday: {profileData.birthday}</h3>
+                <h3>About Me: {profileData.bio}</h3>
+                <InterestsList/>
+                <PrefsList/>
+
+                <FriendsList/>
+            </>);
+        }
     }
 
     if (!found) {
@@ -273,32 +329,14 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     }
 
     else {
+        // allow everyone to see username, and join date
         return(
             <> 
                 <br/>
                 {visitingHeader()}
                 {followButton()}
-                {/* <img src={profileData.pfp} alt=""></img> */}
-                <h3>Name: {profileData.name}</h3>
-                <h3>From: {profileData.state},{profileData.country}</h3>
                 <h3>Joined: {profileData.joinDate}</h3>
-                <h3>Birthday: {profileData.birthday}</h3>
-                <h3>About Me: {profileData.bio}</h3>
-
-                <h3>My Interests:</h3>
-                <ul>
-                    {interestsList()}
-                    {/* {profileData.interests.split(",").map((item, index) => (
-                        <li key={index}>{item}</li>))} */}
-                </ul> 
-
-                <h3>My Preferences:</h3>
-                {prefsList()}
-
-                <h3>Friends:</h3>
-                <ul>
-                    {friendsList()}
-                </ul>
+                <PrivatePortion/>
             </>);
     }
 };
