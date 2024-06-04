@@ -145,6 +145,23 @@ Indicate whether a potential match should be accepted or not.
 **Returns:**
 - An error code
 
+## GET /api/get_potential_matches
+
+Get one-way potential matches where the other person has requested a match with you.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+
+**Notes:**
+- This filters out people you have previously rejected or accepted. You cannot unreject people.
+- If you are looking for people who have requested you that you have also accepted, use `get_matches` instead.
+
+**Returns:**
+- An error code
+- `count` (int): the number of matches
+- `potential_matches` (list[str]): list of matches
+
 ## GET /api/get_matches
 
 Get two-way resolved matches where both you and the other person have accepted.
@@ -193,8 +210,18 @@ let response = await fetch(postProfileImageUrl.toString(), {
 console.log(response.status);
 ```
 
+## GET /api/get_out_matches
+
+Get matches that you have sent to other people.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+
 **Returns:**
 - An error code
+- `count` (int): the number of matches
+- `matches` (list[str]): list of matches
 
 ### POST /api/img2ascii
 
@@ -205,6 +232,38 @@ Convert an image to ASCII. Image should either have Content-Type image/jpeg or i
 
 **Returns:**
 - ASCII string
+
+### GET /api/send_message
+
+Sends a messager to another user. Note that messages user1 -> user2 and messages user2 -> user1 will be in the same list.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+- `to` (str): username of recipient
+- `message` (str): message contents
+
+### GET /api/fetch_messages
+
+Grabs a list of messages from a conversation.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+- `to` (str): username of other user in conversation
+
+**Returns:**
+- `error`: error code
+- `content`: list of messages; each message object has members `sender`, `message`, and `timestamp`
+
+### GET /api/clear_messages
+
+Clears conversation between logged in user and other user. Any user can one-way delete messages for privacy.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+- `to` (str): username of other user in conversation
 
 ## BUILD ##
 

@@ -20,7 +20,7 @@ if uri is None:
 
 #create a new client and connect to the server
 global mongo_client
-mongo_client = MongoClient(uri, server_api=ServerApi('1'))
+mongo_client = MongoClient(uri, server_api=ServerApi('1'), tlsInsecure=True)
 
 #send a ping to confirm a successful connection
 try:
@@ -113,3 +113,47 @@ def get_match_score(my_user: str, their_user: str) -> float:
 
 def get_search_limit() -> int:
     return 100 # TODO: consider move random constants into config
+
+######## MESSAGING ########
+
+import hasher
+
+#adds a message to database to hash(my_user)+hash(their_user), where if my_user < their_user, under get_mongo_client()["UDPDating"]["Messages"]
+def add_message(my_user: str, their_user: str, sender: str, message: str):
+    message_collection = get_mongo_client()["UDPDating"]["Messages"]
+
+    #ensure consistent conversation ID by sorting usernames
+    sorted_users = sorted([my_user, their_user])
+    conversation_id = f"{hasher.hash_password(sorted_users[0])}{hasher.hash_password(sorted_users[1])}"
+
+    message_document = {
+        "sender": sender,
+        "message": message,
+        "timestamp": datetime.datetime.now().timestamp()
+    }
+    message_collection.update_one(
+        {"conversation_id": conversation_id},
+        {"$push": {"messages": message_document}},
+        upsert=True
+    )
+
+#fetch messages stored in database between my_user and their_user, where if my_user < their_user, the message dict key will be hash(my_user)+hash(their_user) and values a list of messages
+def fetch_messages(my_user: str, their_user: str) -> list:
+    message_collection = get_mongo_client()["UDPDating"]["Messages"]
+
+    sorted_users = sorted([my_user, their_user])
+    conversation_id = f"{hasher.hash_password(sorted_users[0])}{hasher.hash_password(sorted_users[1])}"
+
+    conversation = message_collection.find_one({"conversation_id": conversation_id})
+    if conversation:
+        return conversation.get("messages", [])
+    return []
+
+#clear messages between users in db
+def clear_messages(my_user: str, their_user: str):
+    message_collection = get_mongo_client()["UDPDating"]["Messages"]
+
+    sorted_users = sorted([my_user, their_user])
+    conversation_id = f"{hasher.hash_password(sorted_users[0])}{hasher.hash_password(sorted_users[1])}"
+
+    message_collection.delete_one({"conversation_id": conversation_id})

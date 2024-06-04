@@ -32,6 +32,7 @@ UNSUPPORTED_IMAGE_FORMAT = 10
 IMAGE_TOO_LARGE = 11
 FAILED_ASCII_MAGIC_ACTION = 12
 FAILED_PIL_ACTION = 13
+MESSAGING_MATCH_BLOCKED = 14
 
 class ImageASCII(BaseModel):
     image: str
@@ -265,6 +266,32 @@ async def resolve_potential_match(username: str, access_token: str, to: str, suc
     matches_collection.insert_one({"from": username, "to": to, "success": success})
     return JSONResponse({"error": SUCCESS})
 
+@app.get("/api/get_potential_matches")
+async def get_potential_matches(username: str, access_token: str) -> JSONResponse:
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    mongo_client = mongo.get_mongo_client()
+    matches_collection = mongo_client["UDPDating"]["Matches"]
+    
+    # currently, the assumption is that you will match with few people and will not need it chunked
+    potential_matches = set()
+    for potential_match in matches_collection.find({"to": username}):
+        if not potential_match["success"]:
+            continue
+        from_user = potential_match["from"]
+        previous_match = matches_collection.find_one({"$and": [{"from": username}, {"to": from_user}]})
+        if previous_match is not None:
+            continue
+        potential_matches.add(from_user)
+
+    return JSONResponse({"error": SUCCESS, "content": {"count": len(potential_matches), "potential_matches": list(potential_matches)}})
+
 @app.get("/api/get_matches")
 async def get_matches(username: str, access_token: str) -> JSONResponse:
     if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
@@ -275,6 +302,7 @@ async def get_matches(username: str, access_token: str) -> JSONResponse:
                 return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
             case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
                 return JSONResponse({"error": FAILED_MONGODB_ACTION})
+
     mongo_client = mongo.get_mongo_client()
     matches_collection = mongo_client["UDPDating"]["Matches"]
     
@@ -294,8 +322,8 @@ async def get_matches(username: str, access_token: str) -> JSONResponse:
 
     return JSONResponse({"error": SUCCESS, "content": {"count": len(matches), "matches": list(matches)}})
 
-@app.get("/api/get_profile_image")
-async def get_profile_image(username: str, access_token: str) -> JSONResponse:
+@app.get("/api/get_out_matches")
+async def get_out_matches(username: str, access_token: str) -> JSONResponse:
     if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
         match auth:
             case mongo.InternalErrorCode.INVALID_LOGIN:
@@ -305,6 +333,23 @@ async def get_profile_image(username: str, access_token: str) -> JSONResponse:
             case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
                 return JSONResponse({"error": FAILED_MONGODB_ACTION})
     mongo_client = mongo.get_mongo_client()
+       matches_collection = mongo_client["UDPDating"]["Matches"]
+    
+    # currently, the assumption is that you will match with few people and will not need it chunked
+    out_matches = set()
+    for out_match in matches_collection.find({"from": username}):
+        if not out_match["success"]:
+            continue
+        to_user = out_match["to"]
+        previous_match = matches_collection.find_one({"$and": [{"from": to_user}, {"to": username}]})
+        if previous_match is not None:
+            continue
+        out_matches.add(to_user)
+
+    return JSONResponse({"error": SUCCESS, "content": {"count": len(out_matches), "out_matches": list(out_matches)}})
+    
+@app.get("/api/get_profile_image")
+async def get_profile_image(username: str, access_token: str) -> JSONResponse:
     users = mongo_client["UDPDating"]["Users"]
     me = users.find_one({"user": username})
     image = me.get("image", "")
@@ -361,5 +406,63 @@ async def img2ascii(image: UploadFile) -> JSONResponse:
         return JSONResponse({"error": FAILED_ASCII_MAGIC_ACTION})
 
     return JSONResponse({"error": SUCCESS, "content": art.to_ascii(COLUMNS)})
+
+######## MESSAGING ########
+
+@app.post("/api/clear_messages")
+async def clear_messages(username: str, access_token: str, to: str):
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+
+    mongo.clear_messages(username, to)
+    return JSONResponse({"error": SUCCESS})
+
+@app.post("/api/send_message")
+async def send_message(username: str, access_token: str, to: str, message: str):
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+
+    # Ensure the users are matched before allowing sending messages
+    mongo_client = mongo.get_mongo_client()
+    matches_collection = mongo_client["UDPDating"]["Matches"]
+    
+    match_criteria = {
+        "$or": [
+            {"from": username, "to": to, "success": True},
+            {"from": to, "to": username, "success": True}
+        ]
+    }
+    match = matches_collection.find_one(match_criteria)
+    if match is None:
+        return JSONResponse({"error": MESSAGING_MATCH_BLOCKED}, status_code=403)
+
+    mongo.add_message(username, to, username, message)
+    return JSONResponse({"error": SUCCESS})
+
+@app.get("/api/fetch_messages")
+async def fetch_messages(username: str, access_token: str, to: str):
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+
+    messages = mongo.fetch_messages(username, to)
+    return JSONResponse({"error": SUCCESS, "content": messages})
 
 uvicorn.run(app, port=12345, host="0.0.0.0")

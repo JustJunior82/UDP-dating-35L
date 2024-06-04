@@ -57,7 +57,7 @@ function Login({ userInfo, setUserInfo, setLogin }) {
         console.log("attemped login");
         requestLogin(userInfo.username, userInfo.password).then(success => {
             if (success) {
-                setLogin({username: userInfo.username, token: success.content["access-token"], expiration: success.content.expired});
+                setLogin({username: userInfo.username, password: userInfo.password, token: success.content["access-token"], expiration: success.content.expired});
                 navigate("/profile");
             }});
     }
