@@ -1,48 +1,8 @@
 import React from "react";
 import {useState} from "react";
 // import {useNavigate} from "react-router-dom";
- 
-async function postProfile(username, token, props) {
-    let errors = false;
 
-    const date = new Date();
-    let joinDate = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0");
-    props = {...props, joinDate: joinDate};
-
-    for (const [key, value] of Object.entries(props)) {
-        // if (value === '') {
-        //     alert("Please fill out all fields");
-        //     return false;
-        // }
-        let profileURL = new URL('http://localhost:12345/api/post_profile');
-        profileURL.searchParams.append("username", username);
-        profileURL.searchParams.append("access_token", token);
-        profileURL.searchParams.append("profile_key", key);
-        profileURL.searchParams.append("profile", value);
-        console.log(profileURL);
-    
-        let response = await fetch(profileURL.toString(), {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json'
-            },
-        });
-    
-        if (response.status !== 200) {
-            alert("Profile upload failed!");
-            return;
-        }
-    
-        let json = await response.json();
-    
-        if (json.error !== 0) {
-            errors = true;
-        }
-    }
-    if (errors)
-        alert("Error creating profile. Please try again");
-    return !errors;
-}
+import postProfile from "../components/API/postProfile";
 
 function preferenceUpdate(props) {
 
@@ -111,7 +71,7 @@ function preferenceUpdate(props) {
     );
 }
 
-function Profile({ userInfo, masterPrefList, masterInterestsList }) {
+function Settings({ userInfo, masterPrefList, masterInterestsList }) {
     const [preferences, setPreferences] = useState([]);
     const [interests, setInterests] = useState([]);
 
@@ -148,4 +108,4 @@ function Profile({ userInfo, masterPrefList, masterInterestsList }) {
 
 };
  
-export default Profile;
+export default Settings;

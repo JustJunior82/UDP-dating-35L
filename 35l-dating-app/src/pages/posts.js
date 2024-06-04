@@ -1,31 +1,16 @@
 import { React, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import getMatchingProfiles from "../components/API/getMatchingProfiles";
+
 const MAX_NUM_POSTS = 100;
 const MAX_PREFS_DISPLAYED = 2;
 
-async function getMatchingProfiles(key, value) {
-    let profileUrl = new URL('http://localhost:12345/api/search_profile');
-    profileUrl.searchParams.append("profile_key", key);
-    profileUrl.searchParams.append("profile_val", value);
-    console.log(profileUrl);
-    let response = await fetch(profileUrl.toString(), {
-        method: 'GET',
-        headers: {
-            'content-type': 'application/json'
-        },
-    });
-    if (response.status !== 200) {
-        alert("Search failed!");
-        return;
+function renderPosts(info, handleProfileRedirect) {
+    function isPrivate(user) {
+        return(("public" in user) && user.public === "false");
     }
 
-    let json = await response.json();
-
-    return json;
-}
-
-function renderPosts(info, handleProfileRedirect) {
     function prefsList(user) {
         if (!("preferences" in user.profile)) {
             return(<ul><li key="none">None</li></ul>);
@@ -57,6 +42,7 @@ function renderPosts(info, handleProfileRedirect) {
             </ul>
         )
     }
+
     function interestsList(user) {
         if (!("interests" in user.profile)) {
             return (<li key="none">None</li>)
@@ -64,6 +50,22 @@ function renderPosts(info, handleProfileRedirect) {
         return (
             user.profile.interests.split(",").map((item, index) => (
             <li key={index}>{item}</li>)));
+    }
+
+    const PrivatePortion = (props) => {
+        if (isPrivate(props.user.profile)) {
+            return (<p>This Profile is private <br/>(limited information will be displayed)</p>)
+        }
+        else {
+            return(<>
+                <h4>Interests</h4>
+                <ul>
+                {interestsList(props.user)}
+                </ul>
+                <h4>Preferences</h4>
+                {prefsList(props.user)}
+            </>);
+        }
     }
 
     return (
@@ -74,13 +76,7 @@ function renderPosts(info, handleProfileRedirect) {
                 <h3>{user.user}</h3>
                 <button onClick={() => handleProfileRedirect(user.user)}>View Profile</button>
                 <h4>Member since: {user.profile.joinDate}</h4>
-                <h4>Interests</h4>
-                <ul>
-                {interestsList(user)}
-                </ul>
-                <h4>Preferences</h4>
-                {prefsList(user)}
-                --------------------------------
+                <PrivatePortion user={user}/>
             </div>);
         })}
     </>);

@@ -1,5 +1,6 @@
 import React from "react";
 import Navbar from "./components/Navbar/";
+import './App.css';
 import {
     BrowserRouter as Router,
     Routes,
@@ -19,6 +20,8 @@ import Settings from "./pages/settings";
 import Registration from "./pages/registration";
 import Messages from "./pages/messages";
 
+import ChatPage from "./pages/ChatPage";
+
 // import PrivateRoute from "./pages/PrivateRoute";
 
 
@@ -26,14 +29,13 @@ function App() {
     const [isLoggedIn, setLogin] = useState(false);
     const [userInfo, setUserInfo] = useState({
         username: "",
-        password: "",
         token: "",
-        expiration: "",
-        message: "default",
+        expiration: ""
     });
-    // const [userProfile, setUserProfile] = useState({});
     const [visitingProfile, setVisitingProfile] = useState(false);
     const [visitingUsername, setVisitingUsername] = useState("");
+    const [matches, setMatches] = useState([]);
+    const [outMatches, setOutMatches] = useState([]);
 
     const masterPrefList = {ide: ["Visual Studio", "Xcode", "Pycharm", "Atom", "Rstudio"], 
         os: ["MacOS", "Windows", "Linux", "ChromeOS", "iPadOS"], 
@@ -45,7 +47,6 @@ function App() {
         setUserInfo(props);
         setVisitingProfile(false);
     }
-
 
     return (
         <Router>
@@ -66,12 +67,15 @@ function App() {
                     visitingProfile={visitingProfile}
                     setVisitingProfile={setVisitingProfile}
                     visitingUsername={visitingUsername}
-                    setVisitingUsername={setVisitingUsername}/>} />
+                    setVisitingUsername={setVisitingUsername}
+                    matches={matches} setMatches={setMatches}
+                    outMatches={outMatches} setOutMatches={setOutMatches}/>} />
                 <Route path="/settings" element={<Settings userInfo={userInfo} 
                     setUserInfo={setUserInfo} 
                     masterPrefList={masterPrefList}
                     masterInterestsList={masterInterestsList}/>} />
-                <Route path="/messages" element={<Messages userInfo={userInfo}/>} />
+                <Route path="/messages" element={<Messages userInfo={userInfo} 
+                    setCurrMessage={(username) => setUserInfo({...userInfo, message: username})}/>} />
                 {/* hidden page only accessible when registering */}
                 <Route path="/registration" element={<Registration userInfo={userInfo} 
                     setLogin={(props) => handleLogin(props)}

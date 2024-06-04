@@ -16,13 +16,13 @@ const AuthNavbar = () => {
                         Contact Us
                     </NavLink>
                     <NavLink to="/posts" >
-                        Posts
+                        Search
                     </NavLink>
                     <NavLink to="/profile" >
                         Profile
                     </NavLink>
                     <NavLink to="/messages" >
-                        Messages
+                        Chat
                     </NavLink>
                     <NavLink to="/settings" >
                         Settings
@@ -48,7 +48,7 @@ const DefaultNavBar = () => {
                         Contact Us
                     </NavLink>
                     <NavLink to="/posts" >
-                        Posts
+                        Search
                     </NavLink>
                     <NavLink to="/login" >
                         Login

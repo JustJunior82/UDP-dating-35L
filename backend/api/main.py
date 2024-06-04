@@ -318,6 +318,31 @@ async def get_matches(username: str, access_token: str) -> JSONResponse:
 
     return JSONResponse({"error": SUCCESS, "content": {"count": len(matches), "matches": list(matches)}})
 
+@app.get("/api/get_out_matches")
+async def get_out_matches(username: str, access_token: str) -> JSONResponse:
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    mongo_client = mongo.get_mongo_client()
+    matches_collection = mongo_client["UDPDating"]["Matches"]
+    
+    # currently, the assumption is that you will match with few people and will not need it chunked
+    out_matches = set()
+    for out_match in matches_collection.find({"from": username}):
+        if not out_match["success"]:
+            continue
+        to_user = out_match["to"]
+        previous_match = matches_collection.find_one({"$and": [{"from": to_user}, {"to": username}]})
+        if previous_match is not None:
+            continue
+        out_matches.add(to_user)
+
+    return JSONResponse({"error": SUCCESS, "content": {"count": len(out_matches), "out_matches": list(out_matches)}})
 @app.post("/api/img2ascii")
 async def img2ascii(image: UploadFile) -> JSONResponse:
     COLUMNS = 200

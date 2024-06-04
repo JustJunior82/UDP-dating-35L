@@ -175,6 +175,19 @@ Get two-way resolved matches where both you and the other person have accepted.
 - `count` (int): the number of matches
 - `matches` (list[str]): list of matches
 
+## GET /api/get_out_matches
+
+Get matches that you have sent to other people.
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+
+**Returns:**
+- An error code
+- `count` (int): the number of matches
+- `matches` (list[str]): list of matches
+
 ### POST /api/img2ascii
 
 Convert an image to ASCII. Image should either have Content-Type image/jpeg or image/png.

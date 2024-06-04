@@ -2,112 +2,9 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-async function createUser(email, username, password) {
-    let registrationURL = new URL('http://localhost:12345/api/register');
-    registrationURL.searchParams.append("username", username);
-    registrationURL.searchParams.append("password", password);
-    registrationURL.searchParams.append("email", email);
-    let response = await fetch(registrationURL, {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json'
-        },
-		// body: JSON.stringify({username: username, password: password, email: email})
-    });
-
-    if(await response.status !== 200) {
-        alert("Creating a user failed!");
-        return;
-    }
-
-    let json = await response.json();
-    console.log(json);
-
-    switch (json.error) {
-        case 1:
-            alert("Invalid Email. Please enter valid Email");
-            return false;
-        case 2:
-            alert("Email/Username Already Taken!");
-            return false;
-        case 3:
-            alert("Database Error, please try again later");
-            return false;
-        default:
-            console.log("Success creating user");
-            return true;
-    }
-}
-
-async function requestLogin(username, password) {
-    let loginUrl = new URL('http://localhost:12345/api/login');
-    loginUrl.searchParams.append("username", username);
-    loginUrl.searchParams.append("password", password);
-    let response = await fetch(loginUrl.toString(), {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json'
-        },
-    });
-
-    if (response.status !== 200) {
-        alert("Login failed!");
-        return;
-    }
-
-    let json = await response.json();
-    // console.log(json);
-
-    switch (json.error) {
-        case 6:
-            alert("Invalid email or password. Please try again");
-            return false;
-        case 3:
-            alert("Database Error, please try again later");
-            return false;
-        default:
-            console.log("Success Logging in ...");
-            return json;
-    }
-}
-
-async function postProfile(username, token, props) {
-    let errors = false;
-
-    for (const [key, value] of Object.entries(props)) {
-        // if (value === '') {
-        //     alert("Please fill out all fields");
-        //     return false;
-        // }
-        let profileURL = new URL('http://localhost:12345/api/post_profile');
-        profileURL.searchParams.append("username", username);
-        profileURL.searchParams.append("access_token", token);
-        profileURL.searchParams.append("profile_key", key);
-        profileURL.searchParams.append("profile", value);
-        console.log(profileURL);
-    
-        let response = await fetch(profileURL.toString(), {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json'
-            },
-        });
-    
-        if (response.status !== 200) {
-            alert("Profile upload failed!");
-            return;
-        }
-    
-        let json = await response.json();
-    
-        if (json.error !== 0) {
-            errors = true;
-        }
-    }
-    if (errors)
-        alert("Error creating profile. Please try again");
-    return !errors;
-}
+import createUser from "../components/API/createUser";
+import requestLogin from "../components/API/requestLogin";
+import postProfile from "../components/API/postProfile";
 
 const baseRegistration = (props) => {
     return(
@@ -172,8 +69,8 @@ const profileCreation = (props) => {
                 </label>
                 <br/>
                 <label>
-                    Profile Picture (optional):
-                    <input type="file" onChange={props.handleImageChange} accept="image/png, image/jpeg"/>
+                    Private Profile (selecting this option will restrict certain users from viewing your profile):
+                    <input type="checkbox" value={props.publicProfile} onChange={props.handlePublicProfileChange}/>
                 </label>
                 <br/>
                 <button type="submit">Next</button>
@@ -183,7 +80,7 @@ const profileCreation = (props) => {
     );
 }
 
-function preferenceSelection(props) {
+const preferenceSelection = (props) => {
 
     const handleInterestsChange = (event) => {
         const { value, checked } = event.target;
@@ -272,7 +169,7 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
     const [state, setState] = useState('');
     const [birthday, setBirthday] = useState('');
     const [bio, setBio] = useState('');
-    const [image, setImage] = useState('');
+    const [publicProfile, setPublicProfile] = useState(false);
 
     // Preference Selection States
     const [preferences, setPreferences] = useState([]);
@@ -311,7 +208,7 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
     function handleProfileCreation(event) {
         event.preventDefault();
         console.log("posting profile data");
-        let data = {"name": name, "country": country, "state": state, "birthday": birthday, "bio": bio, "pfp": image}
+        let data = {"name": name, "country": country, "state": state, "birthday": birthday, "bio": bio, "public": publicProfile}
         postProfile(userInfo.username, userInfo.token, data).then(success => {
             if (success)
                 setPart(2);
@@ -366,9 +263,8 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
         event.preventDefault();
         setBio(event.target.value);
     }
-    const handleImageChange = (event) => {
-        event.preventDefault();
-        setImage(event.target.files[0]);
+    const handlePublicProfileChange = () => {
+        setPublicProfile(!publicProfile);
     }
 
     switch (part) {
@@ -388,7 +284,8 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
                 handleStateChange: handleStateChange,
                 handleBirthdayChange: handleBirthdayChange,
                 handleBioChange: handleBioChange,
-                handleImageChange: handleImageChange});
+                publicProfile: publicProfile,
+                handlePublicProfileChange: handlePublicProfileChange});
         case 2:
             return preferenceSelection({
                 preferences: preferences,
