@@ -1,6 +1,9 @@
 # UDP: UDP Dating Protocol
 UCLA COM SCI 35L project.
 
+## IMPORTANT: Setting up .env
+To keep the database secure, .env files will be individually sent to TAs. They should be placed under the root UDP-dating-35L directory at UDP-dating-35L/.env.
+
 ## Quickstart
 To just run the application, a quickstart script has been provided in the project root directory.
 ```sh
