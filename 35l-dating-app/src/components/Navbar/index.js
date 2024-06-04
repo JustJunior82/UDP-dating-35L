@@ -18,6 +18,9 @@ const AuthNavbar = () => {
                     <NavLink to="/posts" >
                         Search
                     </NavLink>
+                    <NavLink to="/matching">
+                        Matching
+                    </NavLink>
                     <NavLink to="/profile" >
                         Profile
                     </NavLink>
