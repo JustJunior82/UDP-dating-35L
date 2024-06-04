@@ -18,10 +18,10 @@ const Contact = () => {
                     </h2>
                     <ul>
                         <li><a href="https://github.com/nouturnsign">Eric Wang</a> https://github.com/nouturnsign</li>
-                        <li><a href="https://github.com/yuchaeqi">Andrew Wu</a> https://github.com/yuchaeqi</li>
-                        <li><a href="https://github.com/JustJunior82">Minh Nguyen</a> https://github.com/JustJunior82</li>
                         <li><a href="https://github.com/zack-sima">Zack Sima</a> https://github.com/zack-sima</li>
                         <li><a href="https://github.com/leisongao2005">Leison Gao</a> https://github.com/leisongao2005</li>
+                        <li><a href="https://github.com/yuchaeqi">Andrew Wu</a> https://github.com/yuchaeqi</li>
+                        <li><a href="https://github.com/JustJunior82">Minh Nguyen</a> https://github.com/JustJunior82</li>
                     </ul>
                 </div>
             </div>

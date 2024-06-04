@@ -28,10 +28,10 @@ import ChatPage from "./pages/ChatPage";
 function App() {
     const [isLoggedIn, setLogin] = useState(false);
     const [userInfo, setUserInfo] = useState({
-        username: "",
-        password: "",
-        token: "",
-        expiration: "",
+        username: "testuser",
+        password: "1234",
+        token: "28ed3376-bede-4f49-a6b1-e8add26babff",
+        expiration: "1717486084.96674",
         message: "default",
     });
     // const [userProfile, setUserProfile] = useState({});
@@ -74,7 +74,8 @@ function App() {
                     setUserInfo={setUserInfo} 
                     masterPrefList={masterPrefList}
                     masterInterestsList={masterInterestsList}/>} />
-                <Route path="/messages" element={<Messages userInfo={userInfo}/>} />
+                <Route path="/messages" element={<Messages userInfo={userInfo} 
+                    setCurrMessage={(username) => setUserInfo({...userInfo, message: username})}/>} />
                 {/* hidden page only accessible when registering */}
                 <Route path="/registration" element={<Registration userInfo={userInfo} 
                     setLogin={(props) => handleLogin(props)}

@@ -1,29 +1,10 @@
 import { React, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import getMatchingProfiles from "../components/API/getMatchingProfiles";
+
 const MAX_NUM_POSTS = 100;
 const MAX_PREFS_DISPLAYED = 2;
-
-async function getMatchingProfiles(key, value) {
-    let profileUrl = new URL('http://localhost:12345/api/search_profile');
-    profileUrl.searchParams.append("profile_key", key);
-    profileUrl.searchParams.append("profile_val", value);
-    console.log(profileUrl);
-    let response = await fetch(profileUrl.toString(), {
-        method: 'GET',
-        headers: {
-            'content-type': 'application/json'
-        },
-    });
-    if (response.status !== 200) {
-        alert("Search failed!");
-        return;
-    }
-
-    let json = await response.json();
-
-    return json;
-}
 
 function renderPosts(info, handleProfileRedirect) {
     function prefsList(user) {
@@ -160,6 +141,8 @@ function Posts({ userInfo, masterPrefList, setVisitingProfile, setVisitingUserna
             if (success) {
                 // preventing user from seeing their own profile
                 success = success.filter((event) => event.user !== userInfo.username);
+                // filtering out private profiles
+                success = success.filter((event) => (!("public" in event.profile) || event.profile.public !== false));
                 setPosts(success.slice(0,MAX_NUM_POSTS));
             }
         })

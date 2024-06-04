@@ -22,7 +22,7 @@ const AuthNavbar = () => {
                         Profile
                     </NavLink>
                     <NavLink to="/messages" >
-                        Messages
+                        Chat
                     </NavLink>
                     <NavLink to="/settings" >
                         Settings
@@ -49,9 +49,6 @@ const DefaultNavBar = () => {
                     </NavLink>
                     <NavLink to="/posts" >
                         Posts
-                    </NavLink>
-                    <NavLink to="/messages" >
-                        Chat
                     </NavLink>
                     <NavLink to="/login" >
                         Login
