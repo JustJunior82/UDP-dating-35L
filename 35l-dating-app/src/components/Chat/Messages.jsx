@@ -3,15 +3,15 @@ import React from 'react'
 
 
 const Message = ({ message }) => {
-    let date = new Date(message.timestamp);
-    let timestamp = (date.getHours() + 1).toString().padStart(2, "0") + ":" + date.getMinutes().toString().padStart(2, "0");
+    let date = new Date(message.timestamp * 1000);
+    let timeString = date.toLocaleTimeString();
                         
     return (
         <div className='message owner'>
         <div className='messageInfo'>
             {/* can add username here or timestamp */}
             <span>{message.sender}</span>
-            <span>{timestamp}</span>
+            <span>{timeString}</span>
         </div>
         <div className='messageContent'>
             <p>{message.message}</p>
