@@ -1,5 +1,6 @@
 import React from "react";
 import Navbar from "./components/Navbar/";
+import './App.css';
 import {
     BrowserRouter as Router,
     Routes,
@@ -18,6 +19,8 @@ import Profile from "./pages/profile";
 import Settings from "./pages/settings";
 import Registration from "./pages/registration";
 import Messages from "./pages/messages";
+
+import ChatPage from "./pages/ChatPage";
 
 // import PrivateRoute from "./pages/PrivateRoute";
 
@@ -71,7 +74,8 @@ function App() {
                     setUserInfo={setUserInfo} 
                     masterPrefList={masterPrefList}
                     masterInterestsList={masterInterestsList}/>} />
-                <Route path="/messages" element={<Messages userInfo={userInfo}/>} />
+                <Route path="/messages" element={<Messages userInfo={userInfo} 
+                    setCurrMessage={(username) => setUserInfo({...userInfo, message: username})}/>} />
                 {/* hidden page only accessible when registering */}
                 <Route path="/registration" element={<Registration userInfo={userInfo} 
                     setLogin={(props) => handleLogin(props)}

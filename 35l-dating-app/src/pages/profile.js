@@ -66,7 +66,11 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     const [outMatches, setOutMatches] = useState([]);
     const navigate = useNavigate();
 
-    const requestProfile = (username) => {
+    function isPrivate() {
+        return(("public" in profileData) && profileData.public === "false");
+    }
+
+    function requestProfile(username) {
         get_profile_data(username).then(success => {
             if (success) {
                 setProfileData(success);
@@ -173,39 +177,48 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
     }
 
-    function matchesList() {
+    const MatchesList = () => {
         if (visitingProfile) {
             return;
         }
-        function messageButton(item) {
+
+        const MessageButton = (item) => {
             if (!isLoggedIn) {
                 return;
             }
-            return (<><button onClick={() => handleMessageRedirect(item)}>Message</button><br/></>);
+            return (<button onClick={() => handleMessageRedirect(item)}>Message</button>);
         }
         if (matches.length !== 0) {
-            return(
-                matches.map((item, index) => (
-                <li key={index}>
+            return(<>
+                <h3>My Matches</h3>
+                {matches.map((item, index) => (
+                    <li key={index}>
                     -------------------------
                     <br/>
                     <button onClick={() => handleProfileRedirect(item)}>{item}</button>
                     <br/>
-                    {messageButton()}
-                </li>)));
+                    <MessageButton/>
+                    </li>))}</>);
         }
         else {
-            return(<p>Go to the posts page to find some new matches!</p>);
+            return(<>
+                <h3>My Matches</h3>
+                <p>Go to the Matches page to find some new matches or search by preferenes on the Search Page!</p>
+            </>);
         }
     }
 
-    function prefsList() {
+    const PrefsList = () => {
         if (!("preferences" in profileData)) {
             if (visitingProfile) {
-                return (<ul><li key="none">None</li></ul>);
+                return (<>
+                    <h3>My Preferences:</h3><ul><li key="none">None</li></ul>
+                </>);
             }
             else {
-                return (<ul><li key="none">Add to your preferences list on the Settings page</li></ul>);
+                return (<>
+                    <h3>My Preferences:</h3><ul><li key="none">Add to your preferences list on the Settings page</li></ul>
+                </>);
             }
         }
         let ide = [];
@@ -227,6 +240,8 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             }
         }
         return (
+            <>
+            <h3>My Preferences:</h3>
             <ul>
                 <h4>ide:</h4>
                 {ide}
@@ -235,22 +250,46 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
                 <h4>pl:</h4>
                 {pl}
             </ul>
-        )
+            </>);
     }
 
-    function interestsList() {
+    const InterestsList = () => {
         if (!("interests" in profileData)) {
             if (visitingProfile) {
-                return (<li key="none">None</li>);
+                return (<>
+                    <h3>My Interests:</h3>
+                    <ul> <li key="none">None</li></ul>
+                </>);
             }
             else {
-                return (<li key="none">Add to your interests list on the Settings page</li>)
+                return (<>
+                    <h3>My Interests:</h3>
+                    <ul><li key="none">Add to your interests list on the Settings page</li></ul>
+                </>)
             }
         }
-        return (
-            profileData.interests.split(",").map((item, index) => (
-            <li key={index}>{item}</li>)));
+        return (<>
+            <h3>My Interests:</h3>
+            <ul>{profileData.interests.split(",").map((item, index) => (<li key={index}>{item}</li>))}</ul>
+            </>);
     }
+
+    const PrivatePortion = () => {
+        if (isPrivate() && visitingProfile) {
+            return(<p>This Profile is private, follow {visitingUsername} to see their full profile</p>);
+        }
+        else {
+            return(
+                <>
+                    <h3>Birthday: {profileData.birthday}</h3>
+                    <h3>About Me: {profileData.bio}</h3>
+                    <InterestsList/>
+                    <PrefsList/>
+                    <MatchesList/>
+                </>);
+        }
+    }
+    
 
     useEffect(() => {
         if (loading) {
@@ -263,28 +302,13 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         return;
     }
     else {
+        // allow everyone to see username, and join date
         return(
             <> 
                 <VisitingHeader/>
                 {followButton()}
-                <h3>Name: {profileData.name}</h3>
-                <h3>From: {profileData.state},{profileData.country}</h3>
                 <h3>Joined: {profileData.joinDate}</h3>
-                <h3>Birthday: {profileData.birthday}</h3>
-                <h3>About Me: {profileData.bio}</h3>
-
-                <h3>My Interests:</h3>
-                <ul>
-                    {interestsList()}
-                </ul> 
-
-                <h3>My Preferences:</h3>
-                {prefsList()}
-
-                <h3>Matches:</h3>
-                <ul>
-                    {matchesList()}
-                </ul>
+                <PrivatePortion/>
             </>);
     }
 };

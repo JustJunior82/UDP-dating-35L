@@ -22,7 +22,7 @@ const AuthNavbar = () => {
                         Profile
                     </NavLink>
                     <NavLink to="/messages" >
-                        Messages
+                        Chat
                     </NavLink>
                     <NavLink to="/settings" >
                         Settings
