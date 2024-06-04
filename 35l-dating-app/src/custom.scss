@@ -24,8 +24,6 @@ body {
     display: flex;
     // height: 90vh;
     width: 100vw;
-    // justify-content: center;
-    // align-items: center;
 }
 
 .left {
@@ -112,3 +110,63 @@ body {
     max-height: 1000px;
 }
 
+.contact-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.users {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    height: 81vh;
+    width: 100vw;
+
+    .user {
+        border: 1px solid black;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        // overflow: hidden;
+        padding: 20px 10px;
+        height: 50%; // Add this line
+        box-sizing: border-box;
+        align-items: center;
+        background: linear-gradient(to bottom, white 0%, white 68%, black 68%, black 100%);
+
+        img{
+            width: 100%; // Change this line
+            height: 70%; // Change this line
+            border-bottom: 1px solid black;
+            padding-top: 0px;
+            box-sizing: border-box;
+        }
+
+        .content { // Add this class to your content div
+            height: 40%; // Add this line
+            width: 100%;
+            box-sizing: border-box;
+            align-items: center;
+            display: flex;
+            justify-content: center;    
+            flex-direction: column;
+            color: white;
+        }
+    }
+}
+
+.bottom {
+    display: flex;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+    height: 10vh;
+    background-color: black;
+    color: white;
+    font-size: 1vw;
+    text-align: center;
+}
