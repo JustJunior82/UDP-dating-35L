@@ -126,6 +126,8 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         setMessage(visitingUsername);
         // set current messaging higher state to friend's username
         navigate("/messages");
+        // console.log("visitng", visitingUsername);
+        // console.log("setmessage", userInfo.message);
     }
 
     const VisitingHeader = () => {
@@ -170,7 +172,7 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         })
     }
 
-    function followButton(isMatch) {
+    function followButton(isMatc) {
         console.log("rerender follow button ", isMatch);
         if (!visitingProfile) {
             return;
@@ -191,7 +193,7 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             return;
         }
 
-        const MessageButton = (item) => {
+        const MessageButton = ({ item }) => {
             if (!isLoggedIn) {
                 return;
             }
@@ -206,7 +208,7 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
                     <br/>
                     <button onClick={() => handleProfileRedirect(item)}>{item}</button>
                     <br/>
-                    <MessageButton/>
+                    <MessageButton item={item}/>
                     </li>))}</>);
         }
         else {

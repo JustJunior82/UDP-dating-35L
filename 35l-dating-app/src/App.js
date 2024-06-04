@@ -28,13 +28,10 @@ import ChatPage from "./pages/ChatPage";
 function App() {
     const [isLoggedIn, setLogin] = useState(false);
     const [userInfo, setUserInfo] = useState({
-        username: "testuser",
-        // password: "1234",
+        username: "",
         token: "",
-        // 5fae19a6-979d-43c8-864f-61748f07af2b
         expiration: ""
     });
-    // const [userProfile, setUserProfile] = useState({});
     const [visitingProfile, setVisitingProfile] = useState(false);
     const [visitingUsername, setVisitingUsername] = useState("");
     const [matches, setMatches] = useState([]);
@@ -50,7 +47,6 @@ function App() {
         setUserInfo(props);
         setVisitingProfile(false);
     }
-
 
     return (
         <Router>
