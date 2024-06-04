@@ -77,6 +77,7 @@ function App() {
                 <Route path="/messages" element={<Messages userInfo={userInfo}/>} />
                 {/* hidden page only accessible when registering */}
                 <Route path="/registration" element={<Registration userInfo={userInfo} 
+                    setLogin={(props) => handleLogin(props)}
                     setUserInfo={setUserInfo} 
                     masterPrefList={masterPrefList}
                     masterInterestsList={masterInterestsList}/>} />
