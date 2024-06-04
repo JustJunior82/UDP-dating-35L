@@ -6,6 +6,9 @@ import resolvePotentialMatch from "../components/API/resolvePotentialMatch";
 import getPotentialMatches from "../components/API/getPotentialMatches";
 import getMatches from "../components/API/getMatches";
 import getOutMatches from "../components/API/getOutMatches";
+import parse from 'html-react-parser';
+import Convert from "ansi-to-html";
+import "../App.css"; // for the ascii styling
 
 async function get_profile_data(username) {
     let profileUrl = new URL('http://localhost:12345/api/get_profile');
@@ -63,6 +66,43 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     const [profileData, setProfileData] = useState({ preferences: "", friends: ""});
     const [isMatch, setIsMatch] = useState(false);
     const navigate = useNavigate();
+    const noImage = "";
+    const [selectedImage, setSelectedImage] = React.useState(noImage);
+
+    let convert = new Convert({newline: true, escapeXML: true});
+
+    let username = userInfo["username"];
+    let accessToken = userInfo["token"];
+    React.useEffect(() => {
+        let getProfileImageUrl = new URL('http://localhost:12345/api/get_profile_image');
+        getProfileImageUrl.searchParams.append("username", username);
+        getProfileImageUrl.searchParams.append("access_token", accessToken);
+        fetch(getProfileImageUrl.toString()).then(
+            (response) => {
+                if (response.status !== 200) {
+                    // alert("Not logged in!");
+                    navigate("/login");
+                    return {error: 0, image: noImage};
+                }
+                return response.json(); 
+            }
+        ).then(
+            (responseData) => {
+                if (responseData["error"] !== 0) {
+                    alert("Failed to fetch profile image.");
+                    return noImage;
+                }
+                return responseData["content"];
+            }
+        ).then(
+            (image) => {
+                setSelectedImage(image);
+            }
+        ).catch(
+            error => {}
+        )},
+        [navigate, username, accessToken]
+    );
 
     function isPrivate() {
         return(("public" in profileData) && profileData.public === "false");
@@ -135,6 +175,12 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             return(<>
                 <button onClick={() => {setVisitingProfile(false); setLoading(true); navigate("/posts")}}>Back to Posts</button>
                 <h1>Username: {visitingUsername}</h1>
+                <h2>Profile picture:</h2>
+                <div className="profile-image">
+                    <pre>{
+                        parse(convert.toHtml(selectedImage))
+                    }</pre>
+                </div>
             </>);
         }
         else if (visitingProfile && isLoggedIn) {
@@ -142,10 +188,24 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             <>
                 <button onClick={() => {setVisitingProfile(false); setLoading(true);}}>Back to my Profile</button>
                 <h1> Username: {visitingUsername}</h1>
+                <h2>Profile picture:</h2>
+                <div className="profile-image">
+                    <pre>{
+                        parse(convert.toHtml(selectedImage))
+                    }</pre>
+                </div>
             </>);
         }
         else {
-            return( <h1>Username: {userInfo.username}</h1>)
+            return (<>
+                <h1>Username: {userInfo.username}</h1>
+                <h2>Profile picture:</h2>
+                <div className="profile-image">
+                    <pre>{
+                        parse(convert.toHtml(selectedImage))
+                    }</pre>
+                </div>
+            </>);
         }
     }
 
