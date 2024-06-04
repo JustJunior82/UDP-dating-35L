@@ -39,12 +39,40 @@ async function createUser(email, username, password) {
     }
 }
 
-async function postProfile(username, password, props) {
-    let errors = false;
+async function requestLogin(username, password) {
+    let loginUrl = new URL('http://localhost:12345/api/login');
+    loginUrl.searchParams.append("username", username);
+    loginUrl.searchParams.append("password", password);
+    let response = await fetch(loginUrl.toString(), {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json'
+        },
+    });
 
-    const date = new Date();
-    let joinDate = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0");
-    props = {...props, joinDate: joinDate};
+    if (response.status !== 200) {
+        alert("Login failed!");
+        return;
+    }
+
+    let json = await response.json();
+    // console.log(json);
+
+    switch (json.error) {
+        case 6:
+            alert("Invalid email or password. Please try again");
+            return false;
+        case 3:
+            alert("Database Error, please try again later");
+            return false;
+        default:
+            console.log("Success Logging in ...");
+            return json;
+    }
+}
+
+async function postProfile(username, token, props) {
+    let errors = false;
 
     for (const [key, value] of Object.entries(props)) {
         // if (value === '') {
@@ -53,9 +81,10 @@ async function postProfile(username, password, props) {
         // }
         let profileURL = new URL('http://localhost:12345/api/post_profile');
         profileURL.searchParams.append("username", username);
-        profileURL.searchParams.append("password", password);
+        profileURL.searchParams.append("access_token", token);
         profileURL.searchParams.append("profile_key", key);
         profileURL.searchParams.append("profile", value);
+        console.log(profileURL);
     
         let response = await fetch(profileURL.toString(), {
             method: 'POST',
@@ -154,15 +183,29 @@ const profileCreation = (props) => {
     );
 }
 
-const preferenceSelection = (props) => {
+function preferenceSelection(props) {
 
-    const handleChange = (event) => {
+    const handleInterestsChange = (event) => {
         const { value, checked } = event.target;
 
         console.log(`${value} is ${checked}`);
 
         if (checked) {
-            props.setPreferences([...props.preferences, value]);
+            props.setInterests([...props.interests, value]);
+        }
+        else {
+            props.setInterests(props.interests.filter((event) => event !== value));
+        }
+        console.log("new interests:", props.interests);
+    }
+
+    const handlePreferencesChange = (event, key) => {
+        const { value, checked } = event.target;
+
+        console.log(`${key} for ${value} is ${checked}`);
+
+        if (checked) {
+            props.setPreferences([...props.preferences, key + ":" + value]);
         }
         else {
             props.setPreferences(props.preferences.filter((event) => event !== value));
@@ -170,22 +213,44 @@ const preferenceSelection = (props) => {
         console.log("new preferences:", props.preferences);
     }
 
+    function prefsList() {
+        let list = [];
+        for (const [key, value] of Object.entries(props.masterPrefList)) {
+            list.push(<div key={key}>
+                <h5>{key}</h5>
+                {value.map((item, index) => (
+                <div key={index}>
+                    <input type="checkbox" name={item} value={item} onChange={(event) => handlePreferencesChange(event, key)}/>
+                    <label>{item}</label><br/>
+                </div>))}
+            </div>);
+        }
+        return(
+            <>
+            {list}
+            </>
+        );
+    }
+
     return (
         <>
             <h1>What things are you interested in (We'll use these to help match you with others)</h1>
-            <form>
-                {props.masterPrefList.map((item, index) => (
-                    <div key={index}>
-                        <input type="checkbox" name={item} value={item} onChange={handleChange}/>
-                        <label>{item}</label><br/>
-                    </div>))}
-                <button onClick={props.handleSubmitPreferences}>Finish Profile Creation</button>
+            <form onSubmit={props.handleSubmitPreferences}>
+                <h3>Interests:</h3>
+                {props.masterInterestsList.map((item, index) => (
+                <div key={index}>
+                    <input type="checkbox" name={item} value={item} onChange={handleInterestsChange}/>
+                    <label>{item}</label><br/>
+                </div>))}
+                <h3>Preferences:</h3>
+                {prefsList()}
+                <button type="submit">Finish Profile Creation</button>
             </form>
         </>
     );
 }
 
-function Registration ({ userInfo, setUserInfo, masterPrefList }) {
+function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsList, setLogin }) {
     // General States
     const [part, setPart] = useState(0);
     const navigate = useNavigate();
@@ -211,16 +276,35 @@ function Registration ({ userInfo, setUserInfo, masterPrefList }) {
 
     // Preference Selection States
     const [preferences, setPreferences] = useState([]);
+    const [interests, setInterests] = useState([]);
 
     function handleRegistration(event) {
         event.preventDefault();
         createUser(email, userInfo.username, userInfo.password).then(success => {
             if (success) {
-                let data = {"country": "", "state": "", "birthday": "", "bio": "", "pfp": "", "preferences": "", "friends": ""}
-                postProfile(userInfo.username, userInfo.password, data).then(success => {
-                    if (success)
-                        setPart(1);
-                });
+                setUserInfo({...userInfo, token: "", expiration: "", message: "default"});
+                console.log("user creation success", success);
+                requestLogin(userInfo.username, userInfo.password).then(success => {
+                    console.log("user login success", success);
+                    if (success) {
+                        console.log(success.content["access-token"]);
+                        setLogin({username: userInfo.username, password: userInfo.password, token: success.content["access-token"], expiration: success.content.expired});
+                        const date = new Date();
+                        let joinDate = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-" + date.getDate().toString().padStart(2, "0");
+                        let data = {joinDate: joinDate, country: "", state: "", birthday: "", bio: "", pfp: "", interests: "", ide: "", os: "", pl: "", friends: ""}
+                        
+                        console.log("username", userInfo.username);
+                        console.log("token", userInfo.token);
+                        console.log("data", data);
+                        postProfile(userInfo.username, success.content["access-token"], data).then(success => {
+                            if (success) {
+                                console.log("user base profile creation success", success);
+                                setPart(1);
+                            }
+                            
+                        });
+                    }
+                })
             }});
     }
 
@@ -228,7 +312,7 @@ function Registration ({ userInfo, setUserInfo, masterPrefList }) {
         event.preventDefault();
         console.log("posting profile data");
         let data = {"name": name, "country": country, "state": state, "birthday": birthday, "bio": bio, "pfp": image}
-        postProfile(userInfo.username, userInfo.password, data).then(success => {
+        postProfile(userInfo.username, userInfo.token, data).then(success => {
             if (success)
                 setPart(2);
         });
@@ -236,8 +320,8 @@ function Registration ({ userInfo, setUserInfo, masterPrefList }) {
 
     function handleSubmitPreferences(event) {
         event.preventDefault();
-        // console.log("submitting preferences:", preferences)
-        postProfile(userInfo.username, userInfo.password, { preferences: preferences }).then(success => {
+        console.log("submitting preferences:", preferences)
+        postProfile(userInfo.username, userInfo.token, { interests: interests, preferences: preferences }).then(success => {
             if (success) {
                 navigate("/profile");
             }
@@ -308,7 +392,10 @@ function Registration ({ userInfo, setUserInfo, masterPrefList }) {
         case 2:
             return preferenceSelection({
                 preferences: preferences,
+                interests: interests,
                 masterPrefList: masterPrefList,
+                masterInterestsList: masterInterestsList,
+                setInterests: setInterests,
                 setPreferences: setPreferences,
                 handleSubmitPreferences: handleSubmitPreferences
             });

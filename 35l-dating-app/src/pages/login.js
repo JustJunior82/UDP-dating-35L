@@ -58,7 +58,8 @@ function Login({ userInfo, setUserInfo, setLogin }) {
         requestLogin(userInfo.username, userInfo.password).then(success => {
             if (success) {
                 setLogin({username: userInfo.username, password: userInfo.password, token: success.content["access-token"], expiration: success.content.expired});
-                navigate("/profile");
+                // navigate("/profile");
+                navigate("/settings");
             }});
     }
 

@@ -1,12 +1,13 @@
 import { React, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const MAX_NUM_POSTS = 10;
+const MAX_NUM_POSTS = 100;
+const MAX_PREFS_DISPLAYED = 2;
 
-async function getMatchingProfiles(preference) {
+async function getMatchingProfiles(key, value) {
     let profileUrl = new URL('http://localhost:12345/api/search_profile');
-    profileUrl.searchParams.append("profile_key", "preferences");
-    profileUrl.searchParams.append("profile_val", preference);
+    profileUrl.searchParams.append("profile_key", key);
+    profileUrl.searchParams.append("profile_val", value);
     console.log(profileUrl);
     let response = await fetch(profileUrl.toString(), {
         method: 'GET',
@@ -20,20 +21,51 @@ async function getMatchingProfiles(preference) {
     }
 
     let json = await response.json();
+
     return json;
 }
 
 function renderPosts(info, handleProfileRedirect) {
-
-    function preferenceList(user) {
-        let prefs = user.profile.preferences.split(",");
-        if (prefs.length > 3) {
-            prefs = prefs.slice(0, 3);
-            prefs.push("...");
+    function prefsList(user) {
+        if (!("preferences" in user.profile)) {
+            return(<ul><li key="none">None</li></ul>);
         }
-        return (prefs.map((item, index) => (<li key={index}>{item}</li>)));
+        let ide = [];
+        let os = [];
+        let pl = [];
+        let value;
+        for (value of user.profile.preferences.split(",")) {
+            if (value !== "") {
+                if (value.startsWith("ide")) { ide.push(<li key={value}>{value.slice(4,)}</li>); }
+                else if (value.startsWith("os")) { os.push(<li key={value}>{value.slice(3,)}</li>); }
+                else { pl.push(<li key={value}>{value.slice(3,)}</li>); }
+            }
+        }
 
+        if (ide.length > MAX_PREFS_DISPLAYED) { ide = ide.slice(0, MAX_PREFS_DISPLAYED).push("..."); }
+        if (os.length > MAX_PREFS_DISPLAYED) { os = os.slice(0, MAX_PREFS_DISPLAYED).push("..."); }
+        if (pl.length > MAX_PREFS_DISPLAYED) { pl = pl.slice(0, MAX_PREFS_DISPLAYED).push("..."); }
+
+        return (
+            <ul>
+                <h4>ide:</h4>
+                {ide}
+                <h4>os:</h4>
+                {os}
+                <h4>pl:</h4>
+                {pl}
+            </ul>
+        )
     }
+    function interestsList(user) {
+        if (!("interests" in user.profile)) {
+            return (<li key="none">None</li>)
+        }
+        return (
+            user.profile.interests.split(",").map((item, index) => (
+            <li key={index}>{item}</li>)));
+    }
+
     return (
     <>
         {info.map((user) => {return (
@@ -42,10 +74,12 @@ function renderPosts(info, handleProfileRedirect) {
                 <h3>{user.user}</h3>
                 <button onClick={() => handleProfileRedirect(user.user)}>View Profile</button>
                 <h4>Member since: {user.profile.joinDate}</h4>
-                <h4>Preferences</h4>
-                <ul> 
-                    {preferenceList(user)}
+                <h4>Interests</h4>
+                <ul>
+                {interestsList(user)}
                 </ul>
+                <h4>Preferences</h4>
+                {prefsList(user)}
                 --------------------------------
             </div>);
         })}
@@ -73,7 +107,7 @@ function Search(username, masterPrefList, update) { // handles input filtering a
             // if valid add to filters
             setFilter(searchInput);
             // fetch profiles with preference from backend
-            getMatchingProfiles(searchInput).then(success => {
+            getMatchingProfiles("preferences", searchInput).then(success => {
                 console.log("fetch request", success);
                 if (success) {
                     // update displayed profiles
@@ -122,7 +156,7 @@ function Posts({ userInfo, masterPrefList, setVisitingProfile, setVisitingUserna
     }
 
     if (posts.length === 0) {
-        getMatchingProfiles("").then(success => {
+        getMatchingProfiles("joinDate", "-").then(success => {
             if (success) {
                 // preventing user from seeing their own profile
                 success = success.filter((event) => event.user !== userInfo.username);

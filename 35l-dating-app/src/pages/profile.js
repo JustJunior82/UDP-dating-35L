@@ -175,6 +175,14 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     }
 
     function friendsList() {
+        if (!("friends" in profileData)) {
+            if (visitingProfile) {
+                return(<p>{visitingUsername} has no friends yet. Message them to start chatting!</p>)
+            }
+            else {
+                return(<p>Go to the posts page to find some new friends!</p>);
+            }
+        }
         function messageButton(item) {
             if (!isLoggedIn) {
                 return;
@@ -201,6 +209,59 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
     }
 
+    function prefsList() {
+        if (!("preferences" in profileData)) {
+            if (visitingProfile) {
+                return (<ul><li key="none">None</li></ul>);
+            }
+            else {
+                return (<ul><li key="none">Add to your preferences list on the Settings page</li></ul>);
+            }
+        }
+        let ide = [];
+        let os = [];
+        let pl = [];
+        let value;
+
+        for (value of profileData.preferences.split(",")) {
+            if (value !== "") {
+                if (value.startsWith("ide")) {
+                    ide.push(<li key={value}>{value.slice(4,)}</li>);
+                }
+                else if (value.startsWith("os")) {
+                    os.push(<li key={value}>{value.slice(3,)}</li>);
+                }
+                else {
+                    pl.push(<li key={value}>{value.slice(3,)}</li>);
+                }
+            }
+        }
+        return (
+            <ul>
+                <h4>ide:</h4>
+                {ide}
+                <h4>os:</h4>
+                {os}
+                <h4>pl:</h4>
+                {pl}
+            </ul>
+        )
+    }
+
+    function interestsList() {
+        if (!("interests" in profileData)) {
+            if (visitingProfile) {
+                return (<li key="none">None</li>);
+            }
+            else {
+                return (<li key="none">Add to your interests list on the Settings page</li>)
+            }
+        }
+        return (
+            profileData.interests.split(",").map((item, index) => (
+            <li key={index}>{item}</li>)));
+    }
+
     if (!found) {
         if (!visitingProfile) {
             requestProfile(userInfo.username);
@@ -210,6 +271,7 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
         return;
     }
+
     else {
         return(
             <> 
@@ -221,12 +283,18 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
                 <h3>From: {profileData.state},{profileData.country}</h3>
                 <h3>Joined: {profileData.joinDate}</h3>
                 <h3>Birthday: {profileData.birthday}</h3>
+                <h3>About Me: {profileData.bio}</h3>
+
+                <h3>My Interests:</h3>
+                <ul>
+                    {interestsList()}
+                    {/* {profileData.interests.split(",").map((item, index) => (
+                        <li key={index}>{item}</li>))} */}
+                </ul> 
 
                 <h3>My Preferences:</h3>
-                <ul>
-                    {profileData.preferences.split(",").map((item, index) => (
-                    <li key={index}>{item}</li>))}
-                </ul> 
+                {prefsList()}
+
                 <h3>Friends:</h3>
                 <ul>
                     {friendsList()}
