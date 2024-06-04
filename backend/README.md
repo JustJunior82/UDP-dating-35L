@@ -175,6 +175,41 @@ Get two-way resolved matches where both you and the other person have accepted.
 - `count` (int): the number of matches
 - `matches` (list[str]): list of matches
 
+## GET /api/get_profile_image
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+
+**Returns:**
+- An error code
+- `content` (str): ASCII image
+
+## POST /api/post_profile_image
+
+**Parameters:**
+- `username` (str): The username for the existing user.
+- `access_token` (str): The valid access token for the existing user.
+
+**Notes:**
+- Expects a request body with key "image". See the following example request:
+```js
+let postProfileImageUrl = new URL('http://localhost:12345/api/post_profile_image');
+postProfileImageUrl.searchParams.append("username", ...);
+postProfileImageUrl.searchParams.append("access_token", ...);
+let response = await fetch(postProfileImageUrl.toString(), {
+    method: 'POST',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        image: ...
+    })
+});
+console.log(response.status);
+```
+
 ## GET /api/get_out_matches
 
 Get matches that you have sent to other people.

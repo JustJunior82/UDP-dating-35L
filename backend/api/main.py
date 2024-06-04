@@ -8,6 +8,7 @@ from email_validator import validate_email, EmailNotValidError
 from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 ######## INTERNAL DEPENDENCIES ########
 
@@ -32,6 +33,9 @@ IMAGE_TOO_LARGE = 11
 FAILED_ASCII_MAGIC_ACTION = 12
 FAILED_PIL_ACTION = 13
 MESSAGING_MATCH_BLOCKED = 14
+
+class ImageASCII(BaseModel):
+    image: str
 
 app = FastAPI()
 
@@ -329,7 +333,7 @@ async def get_out_matches(username: str, access_token: str) -> JSONResponse:
             case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
                 return JSONResponse({"error": FAILED_MONGODB_ACTION})
     mongo_client = mongo.get_mongo_client()
-    matches_collection = mongo_client["UDPDating"]["Matches"]
+       matches_collection = mongo_client["UDPDating"]["Matches"]
     
     # currently, the assumption is that you will match with few people and will not need it chunked
     out_matches = set()
@@ -343,9 +347,34 @@ async def get_out_matches(username: str, access_token: str) -> JSONResponse:
         out_matches.add(to_user)
 
     return JSONResponse({"error": SUCCESS, "content": {"count": len(out_matches), "out_matches": list(out_matches)}})
+    
+@app.get("/api/get_profile_image")
+async def get_profile_image(username: str, access_token: str) -> JSONResponse:
+    users = mongo_client["UDPDating"]["Users"]
+    me = users.find_one({"user": username})
+    image = me.get("image", "")
+    return JSONResponse({"error": SUCCESS, "content": image})
+
+@app.post("/api/post_profile_image")
+async def post_profile_image(username: str, access_token: str, body: ImageASCII) -> JSONResponse:
+    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
+        match auth:
+            case mongo.InternalErrorCode.INVALID_LOGIN:
+                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
+            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
+                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
+            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
+                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+    mongo_client = mongo.get_mongo_client()
+    users = mongo_client["UDPDating"]["Users"]
+    # note: this currently assumes that the image field is always valid
+    # ideally, this should probably be checked (e.g. provide img2ascii validation
+    users.find_one_and_update({"user": username}, {"$set": {"image": body.image}})
+    return JSONResponse({"error": SUCCESS})
+
 @app.post("/api/img2ascii")
 async def img2ascii(image: UploadFile) -> JSONResponse:
-    COLUMNS = 200
+    COLUMNS = 120
     FILE_SIZE_LIMIT_BYTES = 2000000
 
     if image.content_type != "image/jpeg" and image.content_type != "image/png":
@@ -356,15 +385,26 @@ async def img2ascii(image: UploadFile) -> JSONResponse:
     image.file.seek(0)
 
     try:
-        pillow_image = PIL.Image.open(image.file)
+        pillow_image = PIL.Image.open(image.file).convert("RGB")
     except Exception:
         return JSONResponse({"error": FAILED_PIL_ACTION})
     
+    width, height = pillow_image.size   # Get dimensions
+
+    square_dim = min(width, height)
+    new_width = new_height = square_dim
+    left = (width - new_width)/2
+    top = (height - new_height)/2
+    right = (width + new_width)/2
+    bottom = (height + new_height)/2
+
+    square_image = pillow_image.crop((left, top, right, bottom))
+    
     try:
-        art = ascii_magic.AsciiArt.from_pillow_image(pillow_image)
+        art = ascii_magic.AsciiArt.from_pillow_image(square_image)
     except Exception:
         return JSONResponse({"error": FAILED_ASCII_MAGIC_ACTION})
-    
+
     return JSONResponse({"error": SUCCESS, "content": art.to_ascii(COLUMNS)})
 
 ######## MESSAGING ########
