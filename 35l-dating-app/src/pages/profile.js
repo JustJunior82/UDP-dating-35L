@@ -58,12 +58,10 @@ async function postProfile(username, password, key, value) {
     return true;
 }
 
-function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisitingProfile, visitingUsername, setVisitingUsername }) {
+function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisitingProfile, visitingUsername, setVisitingUsername, matches, setMatches, outMatches, setOutMatches }) {
     const [loading, setLoading] = useState(true);
     const [profileData, setProfileData] = useState({ preferences: "", friends: ""});
     const [isMatch, setIsMatch] = useState(false);
-    const [matches, setMatches] = useState([]);
-    const [outMatches, setOutMatches] = useState([]);
     const navigate = useNavigate();
 
     function isPrivate() {
@@ -75,6 +73,9 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             if (success) {
                 setProfileData(success);
                 // if not visiting then also get list of matches to display
+                console.log("success:", success);
+                console.log("visitng", visitingProfile);
+
                 if (!visitingProfile) {
                     getMatches(userInfo.username, userInfo.token).then(success => {
                         if (success) {
@@ -89,9 +90,13 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
                     })
                 }
                 else if (matches.includes(username)) { // check if is match for match button display
+                    console.log("matches for", userInfo.username);
+                    console.log(matches);
                     setIsMatch(true);
                 }
                 else {
+                    console.log("matches for", userInfo.username);
+                    console.log(matches);
                     setIsMatch(false);
                 }
                 setLoading(false);
@@ -146,10 +151,13 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         if (!isLoggedIn) {
             alert("Please create an account to match with other users");
             navigate("/registration");
+            return;
         }
 
         resolvePotentialMatch(userInfo.username, userInfo.token, username, match).then(success => {
+            console.log("setting out matches before", outMatches);
             setOutMatches(outMatches => [...outMatches, username]);
+            console.log("setting out matches after", outMatches);
             if (success === 0 && match) {
                 alert("Sent Match Request to " + username);
             }
@@ -162,7 +170,8 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         })
     }
 
-    function followButton() {
+    function followButton(isMatch) {
+        console.log("rerender follow button ", isMatch);
         if (!visitingProfile) {
             return;
         }
@@ -276,7 +285,7 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
 
     const PrivatePortion = () => {
         if (isPrivate() && visitingProfile) {
-            return(<p>This Profile is private, follow {visitingUsername} to see their full profile</p>);
+            return(<p>This Profile is private, match with {visitingUsername} to see their full profile</p>);
         }
         else {
             return(
@@ -298,6 +307,14 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
     }, [loading, visitingProfile, visitingUsername, userInfo.username]);
 
+    useEffect(() => {
+        console.log("isMatch updated:", isMatch);
+    }, [isMatch]);
+
+    useEffect(() => {
+        console.log("matches updated:", matches);
+    }, [matches]);
+
     if (loading) {
         return;
     }
@@ -306,7 +323,7 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         return(
             <> 
                 <VisitingHeader/>
-                {followButton()}
+                {followButton(isMatch)}
                 <h3>Joined: {profileData.joinDate}</h3>
                 <PrivatePortion/>
             </>);

@@ -21,12 +21,13 @@ const Input = (props) => {
         console.log("sending message", messageField);
         setMessageField("");
         // setSending(true);
-        // sendMessage(props.username, props.token, props.currMessage, messageField).then(success => {
-        //     if (success) {
-        //         console.log("submitted");
-        //         setMessageField("");
-        //     }
-        // })
+        sendMessage(props.username, props.token, props.currMessage, messageField).then(success => {
+            if (success) {
+                console.log("submitted");
+                setMessageField("");
+                props.onSendMessage(messageField);
+            }
+        })
 
     }
 
@@ -57,12 +58,22 @@ function Chat (props) {
         })
     }, [props.username, props.token, props.currMessage]);
 
+    useEffect(() => {
+        console.log("Messages updated:", messages);
+    }, [messages]);
+
+    function onSendMessage(message) {
+        const date = new Date();
+        const newMessage = { message: message, sender: props.username, timestamp: date.getTime() };
+        setMessages([...messages, newMessage]);
+    }
+
     if (loading) {
         return;
     }
     
     else {
-        console.log("finished loading");
+        console.log("finished loading", messages);
         return (
             <div className='chat'>
             <div className='chatInfo'>
@@ -72,8 +83,8 @@ function Chat (props) {
                 <RiMoreFill />
                 </div> */}
             </div>
-            <Messages messages={messages} />
-            <Input username={props.username} token={props.token} currMessage={props.currMessage}/>
+            <Messages sender={props.username} messages={messages} />
+            <Input username={props.username} token={props.token} currMessage={props.currMessage} onSendMessage={(message) => onSendMessage(message)}/>
             </div>
         )
     }

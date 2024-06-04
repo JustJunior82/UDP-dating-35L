@@ -7,7 +7,7 @@ const ChatPage = (props) => {
   return (
     <div className='home'>
       <div className='container'>
-        <Sidebar friends={props.friends} currMessage={props.currMessage} setCurrentMessage={props.setCurrentMessage}/>
+        <Sidebar matches={props.matches} currMessage={props.currMessage} setCurrentMessage={props.setCurrentMessage}/>
         <Chat username={props.username} token={props.token} currMessage={props.currMessage}/>
       </div>
     </div>

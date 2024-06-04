@@ -47,29 +47,29 @@ const Chats = (props) => {
     if (props.currMessage === "default") {
         // load messages of first friend
         // console.log(props.friends.split(",").sort().at(0));
-        props.setCurrentMessage(props.friends.split(",").sort().at(0));
+        props.setCurrentMessage(props.matches.sort().at(0));
     }
     // console.log("friends", props.friends);
     let list = [];
-    let friend;
-    for (friend of props.friends.split(",").sort()) {
+    let match;
+    for (match of props.matches.sort()) {
         // change styling to bold current person you are messaging
         /*
         ********************
         how to create on_click references that change for every rendering
         ********************
         */
-        if (friend === props.currMessage) {
-            list.unshift(<div className='userChat' key={friend}>
+        if (match === props.currMessage) {
+            list.unshift(<div className='userChat' key={match}>
                 <div className='userChatInfo'>
-                    <span><b>{friend}</b></span> 
+                    <span><b>{match}</b></span> 
                 </div>
             </div>);
         }
         else {
-            list.push(<div className='userChat' key={friend}>
+            list.push(<div className='userChat' key={match}>
                 <div className='userChatInfo'>
-                    <span>{friend}</span>
+                    <span>{match}</span>
                 </div>
             </div>);
         }
@@ -92,7 +92,7 @@ const Sidebar = (props) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log("query", searchQuery);
-        if (props.friends.split(",").includes(searchQuery)) {
+        if (props.matches.includes(searchQuery)) {
             console.log("submitting");
             props.setCurrentMessage(searchQuery);
             setSearchQuery("");
@@ -106,7 +106,7 @@ const Sidebar = (props) => {
         <div className='sidebar'>
             <Navbar/>
             <Search searchQuery={searchQuery} handleSubmit={handleSubmit} onChange={handleSearchChange} friends={props.friends}/>
-            <Chats friends={props.friends} currMessage={props.currMessage} setCurrentMessage={props.setCurrentMessage}/>
+            <Chats matches={props.matches} currMessage={props.currMessage} setCurrentMessage={props.setCurrentMessage}/>
         </div>
 
   )

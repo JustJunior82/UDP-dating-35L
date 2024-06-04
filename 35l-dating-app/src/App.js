@@ -28,15 +28,17 @@ import ChatPage from "./pages/ChatPage";
 function App() {
     const [isLoggedIn, setLogin] = useState(false);
     const [userInfo, setUserInfo] = useState({
-        username: "",
-        password: "",
+        username: "testuser",
+        // password: "1234",
         token: "",
-        expiration: "",
-        message: "default",
+        // 5fae19a6-979d-43c8-864f-61748f07af2b
+        expiration: ""
     });
     // const [userProfile, setUserProfile] = useState({});
     const [visitingProfile, setVisitingProfile] = useState(false);
     const [visitingUsername, setVisitingUsername] = useState("");
+    const [matches, setMatches] = useState([]);
+    const [outMatches, setOutMatches] = useState([]);
 
     const masterPrefList = {ide: ["Visual Studio", "Xcode", "Pycharm", "Atom", "Rstudio"], 
         os: ["MacOS", "Windows", "Linux", "ChromeOS", "iPadOS"], 
@@ -69,7 +71,9 @@ function App() {
                     visitingProfile={visitingProfile}
                     setVisitingProfile={setVisitingProfile}
                     visitingUsername={visitingUsername}
-                    setVisitingUsername={setVisitingUsername}/>} />
+                    setVisitingUsername={setVisitingUsername}
+                    matches={matches} setMatches={setMatches}
+                    outMatches={outMatches} setOutMatches={setOutMatches}/>} />
                 <Route path="/settings" element={<Settings userInfo={userInfo} 
                     setUserInfo={setUserInfo} 
                     masterPrefList={masterPrefList}
