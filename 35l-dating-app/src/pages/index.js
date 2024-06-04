@@ -1,12 +1,31 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
+import "../custom.scss";
+
 function Home () {
     const navigate = useNavigate();
 	return (
-		<div>
-			<h3>Want to experience the magic of UDP matchmaking?</h3>
-			<button onClick={() => navigate('/registration')}>Get Started</button>
+		<div className='home'>
+			<div className='home-left'>
+				<div className='home-title'>
+					Want to experience the <span className='magic'>magic</span> of UDP matchmaking?
+				</div>
+				<div className='home-content'>
+					Sign up now to find your perfect match!
+				</div>
+				<div className='home-button'>
+					<button onClick={() => navigate('/registration')}>Get Started</button>
+				</div>
+			</div>
+			<div className='home-right'>
+				<div className='home-image'>
+					<img 
+						src='https://srv2.imgonline.com.ua/result_img/imgonline-com-ua-Transparent-background-tLBIOFW36US.png'
+						alt=''
+					/>
+				</div>
+			</div>
 		</div>
 	);
 };

@@ -33,7 +33,7 @@ body {
     align-items: center;
     height: 91vh;
     flex: 1;
-    background-color: black;
+    background-color: #212121;
     flex-direction: column;
 
     .centered-title-text {
@@ -79,13 +79,13 @@ body {
 }
 
 .accordion-item {
-    background-color: black;
+    background-color: #212121;
     margin-bottom: 5px;
     cursor: pointer;
 }
 
 .accordion-title {
-    background-color: black;
+    background-color: #212121;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -97,9 +97,9 @@ body {
 
 .accordion-content {
     background-color: white;
-    color: black;
+    color: #212121;
     width: 100%;
-    border: 1px solid black;
+    border: 1px #212121;
     padding: 0px 20px;
     max-height: 0;
     overflow: hidden;
@@ -135,7 +135,7 @@ body {
         height: 50%; 
         box-sizing: border-box;
         align-items: center;
-        background: linear-gradient(to bottom, white 0%, white 68%, black 68%, black 100%);
+        background: linear-gradient(to bottom, white 0%, white 68%, #212121 68%, #212121 100%);
 
         img{
             width: 100%; 
@@ -163,8 +163,75 @@ body {
     justify-content: center;
     align-items: center;
     height: 10vh;
-    background-color: black;
+    background-color: #212121;
     color: white;
     font-size: 1vw;
     text-align: center;
 }
+
+.home {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100vw;
+    height: 91vh;
+    background-color: #212121;
+    color: white;
+}
+
+.home-title {
+    font-size: 2.5vw;
+    text-align: center;
+    font-weight: bolder;
+    max-width: 40vw;
+    gap: 0px;
+}
+
+.home-button {
+    button {
+        border: 5px black;
+        border-radius: 10px;
+        padding: 10px 30px;
+        color: 12121;
+        background-color: white;
+        font-size: 1vw;
+        margin-top: 40px;
+    }
+}
+
+.home-left {
+    min-width: 60vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 91vh;
+    flex: 1;
+    flex-direction: column;
+}
+
+.home-content {
+    color: #d3d3d3;
+}
+
+.home-right {
+    min-width: 40vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 91vh;
+    flex: 1;
+    flex-direction: column;
+    margin-left: -400px;
+
+    img {
+        border-radius: 10px;
+        padding: 10px 20px;
+    }
+}
+
+.magic {
+    color: purple;
+}
+
