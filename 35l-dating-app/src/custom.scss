@@ -31,7 +31,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 91vh;
+    height: 91.4vh;
     flex: 1;
     background-color: #212121;
     flex-direction: column;
@@ -60,7 +60,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 91vh;
+    height: 91.4vh;
     flex: 1;
     background-color: white;
     flex-direction: column;
@@ -69,7 +69,7 @@ body {
         display: flex;
         justify-content: center;
         align-items: center;
-        color: black;
+        color: #212121;
         font-size: 3vw;
     }
 }
@@ -122,11 +122,11 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    height: 81vh;
+    height: 81.4vh;
     width: 100vw;
 
     .user {
-        border: 1px solid black;
+        border: 1px solid #212121;
         border-radius: 10px;
         display: flex;
         flex-direction: column;
@@ -176,7 +176,7 @@ body {
     align-items: center;
     text-align: center;
     width: 100vw;
-    height: 91vh;
+    height: 91.4vh;
     background-color: #212121;
     color: white;
 }
@@ -191,7 +191,7 @@ body {
 
 .home-button {
     button {
-        border: 5px black;
+        border: 1px solid black;
         border-radius: 10px;
         padding: 10px 30px;
         color: 12121;
@@ -206,7 +206,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 91vh;
+    height: 91.4vh;
     flex: 1;
     flex-direction: column;
 }
@@ -220,7 +220,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 91vh;
+    height: 91.4vh;
     flex: 1;
     flex-direction: column;
     margin-left: -400px;
@@ -233,5 +233,113 @@ body {
 
 .magic {
     color: purple;
+}
+
+.navbar {
+    background-color: black;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+}
+
+.login-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 91.4vh;
+    background-color: #212121;
+}
+
+.login {
+    width: 400px;
+    height: 440px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .5);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 30px rgba(0, 0, 0, .5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    color: white;
+}
+
+.login-title {
+    font-size: 2vw;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.login-content {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .icon {
+        position: relative;
+        color: white;
+        transform: translateX(15px);
+    }
+}
+
+.input-box {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    height: 50px;
+
+    input {
+        width: 135%;
+        transform: translateX(-25px);
+        background-color: white;
+        border-radius: 20px;
+        border: none;
+        color: black;
+        outline: none;
+        padding: 5px 10px;
+    }
+}
+
+.login-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+
+    button {
+        width: 30%;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50px;
+        background-color: black;
+        color: white;
+    }
+}
+
+.login-nav {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+}
+
+.login-reg-link {
+    text-decoration: underline;
+    cursor: pointer;
+    color: lightblue;
+
+    &:hover {
+        font-weight: bold;
+        color: white;
+    }
 }
 

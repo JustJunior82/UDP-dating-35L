@@ -21,7 +21,7 @@ function Home () {
 			<div className='home-right'>
 				<div className='home-image'>
 					<img 
-						src='https://srv2.imgonline.com.ua/result_img/imgonline-com-ua-Transparent-background-tLBIOFW36US.png'
+						src='https://i.ibb.co/4PgLzww/ascii-text-art-bunny-rabbit-take-heart-back-lunch-bag-removebg-preview.png'
 						alt=''
 					/>
 				</div>
