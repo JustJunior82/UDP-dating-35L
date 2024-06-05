@@ -76,7 +76,7 @@ const About = () => {
                     CS35L Final Project: UDP Dating Protocol
                 </div>
                 <div className='centered-author-text'>
-                    Created by: Eric Wang, Andrew Wu, Minh Nguyen, Zack Sima, and Leison Gao
+                    Created by: Eric Wang, Leison Gao, Zack Sima, and Andrew Wu
                 </div>
             </div>
             <div className='right'>
