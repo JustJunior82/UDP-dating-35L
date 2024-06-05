@@ -7,7 +7,7 @@ import "../App.css"; // for the ascii styling
 function Matching ({ userInfo }) {
     let [matchIndex, setMatchIndex] = React.useState(0);
     let [potentialMatches, setPotentialMatches] = React.useState([]);
-    const currentProfile = potentialMatches[matchIndex];
+    const currentProfile = matchIndex < potentialMatches.length ? potentialMatches[matchIndex] : null;
     let [currentImage, setCurrentImage] = React.useState("");
     let [loading, setLoading] = React.useState(true);
     let navigate = useNavigate();
@@ -135,6 +135,10 @@ function Matching ({ userInfo }) {
     if (loading) {
         return <div>Loading...</div>;
     }
+    if (currentProfile === null) {
+        return <div>No more matches.</div>;
+    }
+
     return (
         <div>
             <h1>Reject/Accept</h1>
