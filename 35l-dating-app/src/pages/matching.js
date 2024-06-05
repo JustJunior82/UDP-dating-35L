@@ -38,6 +38,28 @@ function Matching ({ userInfo }) {
         }
         setMatchIndex(matchIndex + 1);
     }
+
+    async function handleAccept() {
+        console.log("accept");
+        let resolveMatchUrl = new URL("http://localhost:12345/api/resolve_potential_match");
+        resolveMatchUrl.searchParams.append("username", username);
+        resolveMatchUrl.searchParams.append("access_token", accessToken);
+        resolveMatchUrl.searchParams.append("to", currentProfile);
+        resolveMatchUrl.searchParams.append("success", "true");
+        let response = await fetch(resolveMatchUrl.toString(), {method: "POST"});
+        if (response.status !== 200) {
+            alert("Failed to reject current profile. Continuing...");
+            // continue despite failure
+        }
+        else {
+            let content = await response.json();
+            if (content["error"] !== 0) {
+                alert("Failed to accept current profile. Continuing...");
+                // continue despite failure
+            }
+        }
+        setMatchIndex(matchIndex + 1);
+    }
     
     React.useEffect(() => {
         // for now, assume only up to default limit number of potential matches
@@ -125,6 +147,7 @@ function Matching ({ userInfo }) {
                 }</pre>
             </div>
             <button onClick={handleReject}>Reject</button>
+            <button onClick={handleAccept}>Accept</button>
         </div>
     );
 }
