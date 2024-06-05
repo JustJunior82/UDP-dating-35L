@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import parse from 'html-react-parser';
 import Convert from "ansi-to-html";
+import { useHotkeys } from 'react-hotkeys-hook'
 import "../App.css"; // for the ascii styling
 
 function Matching ({ userInfo }) {
@@ -60,6 +61,9 @@ function Matching ({ userInfo }) {
         }
         setMatchIndex(matchIndex + 1);
     }
+
+    useHotkeys('ctrl+b', handleReject);
+    useHotkeys('ctrl+f', handleAccept);
     
     React.useEffect(() => {
         // for now, assume only up to default limit number of potential matches
