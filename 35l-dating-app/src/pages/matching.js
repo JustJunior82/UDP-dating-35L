@@ -12,10 +12,32 @@ function Matching ({ userInfo }) {
     let [loading, setLoading] = React.useState(true);
     let navigate = useNavigate();
 
-    let username = userInfo.username;
-    let accessToken = userInfo.token;
+    let [username, setUsername] = React.useState(userInfo.username);
+    let [accessToken, setAccessToken] = React.useState(userInfo.token);
 
     let convert = new Convert({newline: true, escapeXML: true});
+
+    async function handleReject() {
+        console.log("reject");
+        let resolveMatchUrl = new URL("http://localhost:12345/api/resolve_potential_match");
+        resolveMatchUrl.searchParams.append("username", username);
+        resolveMatchUrl.searchParams.append("access_token", accessToken);
+        resolveMatchUrl.searchParams.append("to", currentProfile);
+        resolveMatchUrl.searchParams.append("success", "false");
+        let response = await fetch(resolveMatchUrl.toString(), {method: "POST"});
+        if (response.status !== 200) {
+            alert("Failed to reject current profile. Continuing...");
+            // continue despite failure
+        }
+        else {
+            let content = await response.json();
+            if (content["error"] !== 0) {
+                alert("Failed to reject current profile. Continuing...");
+                // continue despite failure
+            }
+        }
+        setMatchIndex(matchIndex + 1);
+    }
     
     React.useEffect(() => {
         // for now, assume only up to default limit number of potential matches
@@ -56,10 +78,10 @@ function Matching ({ userInfo }) {
                 navigate("/login");
             }
         )
-    });
+    }, [username, accessToken, navigate]);
 
     React.useEffect(() => {
-        if (loading || currentProfile === null)
+        if (loading || currentProfile === undefined || currentProfile === null)
             return;
         let getProfileImageUrl = new URL('http://localhost:12345/api/get_profile_image');
         getProfileImageUrl.searchParams.append("username", currentProfile);
@@ -102,6 +124,7 @@ function Matching ({ userInfo }) {
                     parse(convert.toHtml(currentImage))
                 }</pre>
             </div>
+            <button onClick={handleReject}>Reject</button>
         </div>
     );
 }
