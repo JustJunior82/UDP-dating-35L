@@ -20,7 +20,7 @@ if uri is None:
 
 #create a new client and connect to the server
 global mongo_client
-mongo_client = MongoClient(uri, server_api=ServerApi('1'))
+mongo_client = MongoClient(uri, server_api=ServerApi('1'), tlsInsecure=True)
 
 #send a ping to confirm a successful connection
 try:
