@@ -226,7 +226,9 @@ async def search_potential_matches(username: str, access_token: str, skip: int =
     # find chunk of matches with varying goodness and use match filter
     result = []
     matches = mongo_client["UDPDating"]["Matches"]
-    for them in users.find(match_filter, skip=skip, limit=limit):
+    for them in users.find(match_filter, skip=skip, limit=mongo.get_search_limit()):
+        if len(result) >= limit:
+            break
         # cannot match oneself
         if them["user"] == me["user"]:
             continue

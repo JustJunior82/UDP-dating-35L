@@ -67,7 +67,7 @@ function Matching ({ userInfo }) {
         let searchPotentialMatchesURL = new URL("http://localhost:12345/api/search_potential_matches");
         searchPotentialMatchesURL.searchParams.append("username", username);
         searchPotentialMatchesURL.searchParams.append("access_token", accessToken);
-        searchPotentialMatchesURL.searchParams.append("limit", "8"); // this limit is currently hardcoded for performance reasons
+        searchPotentialMatchesURL.searchParams.append("limit", "20"); // this limit is currently hardcoded for performance reasons
         fetch(searchPotentialMatchesURL.toString()).then(
             (response) => {
                 if (response.status !== 200) {
