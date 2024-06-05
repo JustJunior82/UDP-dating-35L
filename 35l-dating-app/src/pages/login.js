@@ -90,7 +90,7 @@ function Login({ userInfo, setUserInfo, setLogin }) {
                                     <span className='icon'>
                                         <FaUser /> 
                                     </span> 
-                                    <div className="input-box">
+                                    <div className="login-input-box">
                                         <label>
                                             <input type="text" onChange={handleUsernameChange} placeholder='Username'/>
                                         </label>
@@ -100,7 +100,7 @@ function Login({ userInfo, setUserInfo, setLogin }) {
                                     <span className='icon'>
                                         <FaLock /> 
                                     </span>
-                                    <div className='input-box'>
+                                    <div className='login-input-box'>
                                         <label>
                                             <input type="password" onChange={handlePasswordChange} placeholder='Password'/>
                                         </label>

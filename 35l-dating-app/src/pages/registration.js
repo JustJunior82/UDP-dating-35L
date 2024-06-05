@@ -6,34 +6,67 @@ import createUser from "../components/API/createUser";
 import requestLogin from "../components/API/requestLogin";
 import postProfile from "../components/API/postProfile";
 
+import { FaLock } from "react-icons/fa";
+import { FaUser } from "react-icons/fa6";
+import { IoMail } from "react-icons/io5";
+
 const baseRegistration = (props) => {
     return(
-        <>
-            <h1>Welcome to UDP Dating App</h1>
-            <h2>Create your account below:</h2>
-            <h3>I already have an account</h3>
-            <button onClick={() => props.navigate("/login")}>Login Page</button> 
-            <br/>
-            <br/>
-            <br/>
-            <form onSubmit={props.handleRegistration}>
-                <label>
-                    Email:
-                    <input type="email" onChange={props.handleEmailChange} />
-                </label>
-                <br/>
-                <label>
-                    Username:
-                    <input type="text" onChange={props.handleUsernameChange} />
-                </label>
-                <br/>
-                <label>
-                    Password:
-                    <input type="password" onChange={props.handlePasswordChange} />
-                </label>
-                <button type="submit">Register</button>
-            </form>
-        </>
+        <div className='register-body'>
+            <div className='register'>
+                <>
+                    <div className='register-title'>
+                        Welcome to UDP Dating App!
+                    </div>
+                    <div className="register-subtitle">
+                        Register below:
+                    </div>
+                    {/* <button onClick={() => props.navigate("/login")}>Login Page</button>  */}
+                    <div className='register-form'>
+                        <form onSubmit={props.handleRegistration}>
+                            <div className='register-content'>
+                                <span className='icon'>
+                                    <IoMail />
+                                </span>
+                                <div className="register-input-box">
+                                <label>
+                                    <input type="email" onChange={props.handleEmailChange} placeholder='Email'/>
+                                </label>
+                                </div>
+                            </div>
+                            <div className='register-content'>
+                                    <span className='icon'>
+                                        <FaUser /> 
+                                    </span> 
+                                <div className="register-input-box">
+                                <label>
+                                    <input type="text" onChange={props.handleUsernameChange} placeholder='Username'/>
+                                </label>
+                                </div>
+                            </div>
+                            <div className='register-content'>
+                                <span className='icon'>
+                                    <FaLock /> 
+                                </span>
+                                <div className="register-input-box">
+                                <label>
+                                    <input type="password" onChange={props.handlePasswordChange} placeholder='Password'/>
+                                </label>
+                                </div>
+                            </div>
+                            <div className='register-button'>
+                                <button type="submit">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div className='register-nav'>
+                        Already have an account?&nbsp;
+                        <div className='register-login-link' onClick={() => props.navigate('/login')}>Login here.</div>
+                    </div>
+                </>
+            </div>
+        </div>
+        
     );
 }
 
