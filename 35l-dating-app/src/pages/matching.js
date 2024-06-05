@@ -145,7 +145,7 @@ function Matching ({ userInfo }) {
 
     return (
         <div>
-            <h1>Reject/Accept</h1>
+            <h1>Reject (ctrl+b)/Accept (ctrl+f)</h1>
             <div>
                 {currentProfile}
             </div>
