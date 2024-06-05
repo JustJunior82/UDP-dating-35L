@@ -179,7 +179,6 @@ Get two-way resolved matches where both you and the other person have accepted.
 
 **Parameters:**
 - `username` (str): The username for the existing user.
-- `access_token` (str): The valid access token for the existing user.
 
 **Returns:**
 - An error code
