@@ -454,3 +454,116 @@ body {
         color: #0000FF;
     }
 }
+
+.profile-creation {
+    height: 91.4vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+    background-color: #212121;
+    color: white
+}
+
+.create-profile-title {
+    font-size: 2vw;
+    width: 48%;
+    text-align: center;
+    padding: 20px 0;
+    background-color: #d3d3d3;
+    color: black;
+    font-weight: bolder;
+}
+
+.create-profile-subtitle {
+    background-color: black;
+    color: white;
+    width: 48%;
+    padding: 5px 5px;
+}
+
+.double-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 20px 0;
+
+    .profile-input-box:first-child {
+        flex: 0 0 69%;
+        input {
+            width: 100%;
+            border: 1px solid black;
+            border-radius: 3px;
+        }
+    }
+    .profile-input-box:last-child {
+        flex: 0 0 29%;
+        input {
+            width: 100%;
+            border: 1px solid black;
+            border-radius: 3px;
+        }
+    }
+}
+
+.second-double-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 20px 0;
+
+    .profile-input-box:first-child {
+        flex: 0 0 49%;
+        input {
+            width: 100%;
+            border: 1px solid black;
+            border-radius: 3px;
+        }
+    }
+    .profile-input-box:last-child {
+        flex: 0 0 49%;
+        input {
+            width: 100%;
+            border: 1px solid black;
+            border-radius: 3px;
+            transform: translateY(46px);
+        }
+    }  
+}
+
+.profile-input-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.next-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+
+    button {
+        width: 15%;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50px;
+        background-color: black;
+        color: white;
+    } 
+}
+
+.required-asterisk {
+    color: red;
+}
+
+.profile-privacy {
+    padding: 20px 0;
+
+    input {
+        transform: translateX(5px) translateY(2px);
+    }
+}

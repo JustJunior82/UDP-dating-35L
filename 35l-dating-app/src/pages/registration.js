@@ -72,44 +72,61 @@ const baseRegistration = (props) => {
 
 const profileCreation = (props) => {
     return (
-        <>
-            <h1>Create your Profile</h1>
-            <br/>
-            <form onSubmit={props.handleProfileCreation}>
-                <h2>Full Name</h2>
-                <label>
-                    <input type="text" onChange={props.handleNameChange} />
-                </label>
-                <h2>Where do you Live? (optional)</h2>
-                <label>
-                    Country:
-                    <input type="text" onChange={props.handleCountryChange} />
-                </label>
-                <label>
-                    State:
-                    <input type="text" onChange={props.handleStateChange} />
-                </label>
-                <h2>What is your Birthday?</h2>
-                <label>
-                    Birthday:
-                    <input type="date" onChange={props.handleBirthdayChange} />
-                </label>
-                <br/>
-                <label>
-                    About Me:
+        <div className='profile-creation'>
+            <>
+                <div className='create-profile-title'>
+                    Create your Profile
+                </div>
+                <div className='create-profile-subtitle'>
+                    <span className='required-asterisk'>*</span> are required fields
+                </div>
+                <div className='create-profile-form'>
+                <form onSubmit={props.handleProfileCreation}>
+                    <div className='double-box'>
+                        <div className='profile-input-box'>
+                            <h2>Full Name<span className='required-asterisk'>*</span></h2>
+                            <label>
+                                <input type="text" onChange={props.handleNameChange} />
+                            </label>
+                        </div>
+                        <div className='profile-input-box'>
+                            <h2>Birthday<span className='required-asterisk'>*</span></h2>
+                            <label>
+                                <input type="date" onChange={props.handleBirthdayChange} />
+                            </label>
+                        </div>
+                    </div>
+                    <div className='second-double-box'>
+                        <div className='profile-input-box'>
+                        <h2>Where do you Live?</h2>
+                        <label>
+                            <input type="text" onChange={props.handleCountryChange} placeholder='Country'/>
+                        </label>
+                        </div>
+                        <div className='profile-input-box'>
+                        <label>
+                            <input type="text" onChange={props.handleStateChange} placeholder='State'/>
+                        </label>
+                        </div>
+                    </div>
+                    <label>
+                        <h2>About Me:<span className='required-asterisk'>*</span></h2>
+                        <textarea onChange={props.handleBioChange} rows="4" cols="100"></textarea>
+                    </label>
                     <br/>
-                    <textarea onChange={props.handleBioChange} rows="4" cols="100"></textarea>
-                </label>
-                <br/>
-                <label>
-                    Private Profile (selecting this option will restrict certain users from viewing your profile):
-                    <input type="checkbox" value={!props.publicProfile} onChange={props.handlePublicProfileChange}/>
-                </label>
-                <br/>
-                <button type="submit">Next</button>
-            </form>
-            <br/>
-        </>
+                    <div className='profile-privacy'>
+                        <label>
+                            Private Profile (selecting this option will restrict certain users from viewing your profile):
+                            <input type="checkbox" value={!props.publicProfile} onChange={props.handlePublicProfileChange}/>
+                        </label>
+                    </div>
+                    <div className='next-button'>
+                        <button type="submit">Next</button>
+                    </div>
+                </form>
+                </div>
+            </>
+        </div>
     );
 }
 
