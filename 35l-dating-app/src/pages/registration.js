@@ -70,7 +70,7 @@ const profileCreation = (props) => {
                 <br/>
                 <label>
                     Private Profile (selecting this option will restrict certain users from viewing your profile):
-                    <input type="checkbox" value={props.publicProfile} onChange={props.handlePublicProfileChange}/>
+                    <input type="checkbox" value={!props.publicProfile} onChange={props.handlePublicProfileChange}/>
                 </label>
                 <br/>
                 <button type="submit">Next</button>
@@ -207,8 +207,7 @@ function Registration ({ userInfo, setUserInfo, masterPrefList, masterInterestsL
 
     function handleProfileCreation(event) {
         event.preventDefault();
-        console.log("posting profile data");
-        let data = {"name": name, "country": country, "state": state, "birthday": birthday, "bio": bio, "public": publicProfile}
+        let data = {"name": name, "country": country, "state": state, "birthday": birthday, "bio": bio, "public": !publicProfile}
         postProfile(userInfo.username, userInfo.token, data).then(success => {
             if (success)
                 setPart(2);

@@ -2,6 +2,7 @@ import { React, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import getMatchingProfiles from "../components/API/getMatchingProfiles";
+import searchUsers from "../components/API/searchUsers";
 
 const MAX_NUM_POSTS = 100;
 const MAX_PREFS_DISPLAYED = 2;
@@ -27,9 +28,9 @@ function renderPosts(info, handleProfileRedirect) {
             }
         }
 
-        if (ide.length > MAX_PREFS_DISPLAYED) { ide = ide.slice(0, MAX_PREFS_DISPLAYED).push("..."); }
-        if (os.length > MAX_PREFS_DISPLAYED) { os = os.slice(0, MAX_PREFS_DISPLAYED).push("..."); }
-        if (pl.length > MAX_PREFS_DISPLAYED) { pl = pl.slice(0, MAX_PREFS_DISPLAYED).push("..."); }
+        if (ide.length > MAX_PREFS_DISPLAYED) { ide = [ide.slice(0, MAX_PREFS_DISPLAYED), <li key={0}>...</li>]; }
+        if (os.length > MAX_PREFS_DISPLAYED) { os = [os.slice(0, MAX_PREFS_DISPLAYED), <li key={0}>...</li>]; }
+        if (pl.length > MAX_PREFS_DISPLAYED) { pl = [pl.slice(0, MAX_PREFS_DISPLAYED), <li key={0}>...</li>]; }
 
         return (
             <ul>
@@ -82,7 +83,7 @@ function renderPosts(info, handleProfileRedirect) {
     </>);
 }
 
-function Search(username, masterPrefList, update) { // handles input filtering and relays information to backend
+function Search({ username, masterPrefList, masterInterestsList, update }) { // handles input filtering and relays information to backend
     const [searchInput, setSearchInput] = useState("");
     const [filter, setFilter] = useState("");
 
@@ -92,55 +93,95 @@ function Search(username, masterPrefList, update) { // handles input filtering a
     }
 
     function handleSubmit () {
-        console.log("seaching");
         if (searchInput.length > 0) {
-            // check if input is a valid preference
-
-            if (!masterPrefList.includes(searchInput)) {
-                alert("Not a valid preference");
-                return;
+            // check if input is a valid preference, interest, or username
+            let key = "";
+            if (Object.values(masterPrefList).flat().includes(searchInput)) {
+                setFilter(searchInput);
+                // fetch profiles with preference from backend
+                getMatchingProfiles("preferences", searchInput).then(success => {
+                    console.log("fetch request", success);
+                    if (success) {
+                        // update displayed profiles
+                        console.log("success, updating, preferences");
+                        success = success.filter((event) => event.user !== username);
+                        update(success.slice(0,MAX_NUM_POSTS));
+                        setSearchInput("");
+                    }
+                })
             }
-            // if valid add to filters
-            setFilter(searchInput);
-            // fetch profiles with preference from backend
-            getMatchingProfiles("preferences", searchInput).then(success => {
-                console.log("fetch request", success);
-                if (success) {
-                    // update displayed profiles
-                    console.log("success, updating");
-                    success = success.filter((event) => event.user !== username);
-                    update(success.slice(0,MAX_NUM_POSTS));
-                }
-            })
+            else if (masterInterestsList.includes(searchInput)) {
+                setFilter(searchInput);
+                // fetch profiles with preference from backend
+                getMatchingProfiles("interests", searchInput).then(success => {
+                    console.log("fetch request", success);
+                    if (success) {
+                        // update displayed profiles
+                        console.log("success, updating, intetests");
+                        success = success.filter((event) => event.user !== username);
+                        update(success.slice(0,MAX_NUM_POSTS));
+                        setSearchInput("");
+                    }
+                })
+            }
+            else {
+                // try to search for profile, if success redirect to profile
+                searchUsers(searchInput).then(success => {
+                    if (success.length !== 0) {
+                        setFilter(searchInput);
+                        console.log("success, updating, username");
+                        console.log(success);
+                        success = success.filter((event) => event.user !== username);
+                        update(success.slice(0,MAX_NUM_POSTS));
+                        setSearchInput("");
+                        return;
+                    }
+                    else {
+                        alert("Not a valid search query");
+                        return;
+                    }
+                })
+            }
         }
     }
-    function filterButton() {
+
+    function clearFilter() {
+        setFilter("");
+        getMatchingProfiles("joinDate", "-").then(success => {
+            if (success) {
+                // preventing user from seeing their own profile
+                success = success.filter((event) => event.user !== username);
+                update(success.slice(0,MAX_NUM_POSTS));
+            }
+        });
+    }
+
+    const FilterButton = () => {
         if (filter !== "") {
-            return (
-                <>
-                    <p>Current filter: {filter}</p> 
-                    <button onClick={() => setFilter("")}>Clear filter</button>
-                </>);
+            return (<> <p>Current filter: {filter}</p> <button onClick={clearFilter}>Clear filter</button> </>);
         }
-        else {
-            return;
+        return;
+    }
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handleSubmit(event);
         }
     }
+
     return(
         <>
-            <input
-            type="search"
-            placeholder="Search here"
-            onChange={handleChange}
-            value={searchInput} />
-            <button onClick={handleSubmit}>Search</button>
+        <form onKeyDown={handleKeyDown}>
+            <input type="search" placeholder="Search here" onChange={handleChange} value={searchInput} />
+        </form>
             <br/>
-            {filterButton()}
+            <FilterButton/>
         </>
     )
 }
 
-function Posts({ userInfo, masterPrefList, setVisitingProfile, setVisitingUsername }) {
+function Posts({ userInfo, masterPrefList, masterInterestsList, setVisitingProfile, setVisitingUsername }) {
     const [posts, setPosts] = useState([]);
 
     const navigate = useNavigate();
@@ -164,7 +205,7 @@ function Posts({ userInfo, masterPrefList, setVisitingProfile, setVisitingUserna
     return (
     <>
         <h1>View Public Profiles</h1>
-        {Search(userInfo.username, masterPrefList, setPosts)}
+        <Search username={userInfo.username} masterPrefList={masterPrefList} masterInterestsList={masterInterestsList} update={setPosts}/>
         {renderPosts(posts, (username) => handleProfileRedirect(username))}
     </>);
 };

@@ -1,5 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import "../custom.scss";
+
+import { FaLock } from "react-icons/fa";
+import { FaUser } from "react-icons/fa6";
 
 // username: testuser
 // password: 1234
@@ -73,27 +77,50 @@ function Login({ userInfo, setUserInfo, setLogin }) {
     }
 
     return(
-        <>
-            <div className="popup">
-                <div className="popup-inner">
-                    <h2>Login</h2>
-                    <form onSubmit={handleLogin}>
-                        <label>
-                            Username:
-                            <input type="text" onChange={handleUsernameChange} />
-                        </label>
-                        <br/>
-                        <label>
-                            Password:
-                            <input type="password" onChange={handlePasswordChange} />
-                        </label>
-                        <button type="submit">Login</button>
-                    </form>
-                    <h2>Don't have an account?</h2>
-                    <button onClick={() => navigate('/registration')}>Register here</button> 
-                </div>
-            </div>
-        </>
+        <div className='login-body'>
+            <div className='login'>
+                <>
+                    <div className="popup">
+                        <div className="popup-inner">
+                            <div className='login-title'>
+                                Login
+                            </div>
+                            <form onSubmit={handleLogin}>
+                                <div className='login-content'>
+                                    <span className='icon'>
+                                        <FaUser /> 
+                                    </span> 
+                                    <div className="input-box">
+                                        <label>
+                                            <input type="text" onChange={handleUsernameChange} placeholder='Username'/>
+                                        </label>
+                                    </div> 
+                                </div>
+                                <div className='login-content'>
+                                    <span className='icon'>
+                                        <FaLock /> 
+                                    </span>
+                                    <div className='input-box'>
+                                        <label>
+                                            <input type="password" onChange={handlePasswordChange} placeholder='Password'/>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className='login-button'>
+                            <button type="submit">Login</button>
+                                </div>
+                            </form>
+                            {/* <h2>Don't have an account?</h2>
+                            <div onClick={() => navigate('/registration')}>Register here</div>  */}
+                            <div className='login-nav'>
+                                Don't have an account?&nbsp;
+                                <div className='login-reg-link' onClick={() => navigate('/registration')}>Register here.</div> 
+                            </div>
+                        </div>
+                    </div>
+                </>
+            </div> 
+        </div>   
     );
 };
 
