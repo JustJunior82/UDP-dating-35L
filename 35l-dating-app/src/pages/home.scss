@@ -5,7 +5,7 @@
 }
 
 .home {
-    background-color: #c5b4fa;
+    background-color: #536878;
     height: 91vh;
     display: flex;
     align-items: center;
@@ -22,7 +22,7 @@
 
         .sidebar{
             flex: .5; 
-            background-color:#7b6aad;
+            background-color:#1f4959;
             width: 100px;
 
             .search {
@@ -56,7 +56,7 @@
                 cursor: pointer;
 
                 &:hover {
-                    background-color: #443963;
+                    background-color: #163c4a;
                 }
 
                 img {
@@ -83,7 +83,7 @@
             .navbar {
                 display: flex;
                 align-items: center;
-                background-color: #35216e;
+                background-color: #011425;
                 height: 50px;
                 padding: 10px;
                 justify-content: space-between;
