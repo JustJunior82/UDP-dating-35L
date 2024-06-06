@@ -34,11 +34,11 @@ function renderPosts(info, handleProfileRedirect) {
 
         return (
             <ul>
-                <h4>ide:</h4>
+                <h7>ide:</h7>
                 {ide}
-                <h4>os:</h4>
+                <h7>os:</h7>
                 {os}
-                <h4>pl:</h4>
+                <h7>pl:</h7>
                 {pl}
             </ul>
         )
@@ -59,12 +59,15 @@ function renderPosts(info, handleProfileRedirect) {
         }
         else {
             return(<>
-                <h4>Interests</h4>
-                <ul>
-                {interestsList(props.user)}
-                </ul>
-                <h4>Preferences</h4>
-                {prefsList(props.user)}
+                <div className='posts-content'>
+                    <div className='posts-subtitle'>Interests</div>
+                    <ul>
+                    {interestsList(props.user)}
+                    </ul>
+                    <div className='posts-subtitle'>Preferences</div>
+                    {prefsList(props.user)}
+                </div>
+                
             </>);
         }
     }
@@ -73,11 +76,22 @@ function renderPosts(info, handleProfileRedirect) {
     <>
         {info.map((user) => {return (
             <div key={user.user}>
-                --------------------------------
-                <h3>{user.user}</h3>
-                <button onClick={() => handleProfileRedirect(user.user)}>View Profile</button>
-                <h4>Member since: {user.profile.joinDate}</h4>
-                <PrivatePortion user={user}/>
+                <hr className='thin-posts-horizontal-bar' />
+                <div className='single-post'>
+                    <div className='posts-user'>
+                        <div className='posts-username'>
+                            {user.user}
+                        </div>
+                        <div className='posts-click'>
+                            <span onClick={() => handleProfileRedirect(user.user)}>View Profile</span>
+                        </div>
+                    </div>
+                    
+                    
+                    <div className='posts-join'>Member since: {user.profile.joinDate}</div>
+                    <PrivatePortion user={user}/>
+                </div>
+                
             </div>);
         })}
     </>);
@@ -173,7 +187,7 @@ function Search({ username, masterPrefList, masterInterestsList, update }) { // 
     return(
         <>
         <form onKeyDown={handleKeyDown}>
-            <input type="search" placeholder="Search here" onChange={handleChange} value={searchInput} />
+            <input type="search" placeholder="Search here..." onChange={handleChange} value={searchInput} />
         </form>
             <br/>
             <FilterButton/>
@@ -203,11 +217,15 @@ function Posts({ userInfo, masterPrefList, masterInterestsList, setVisitingProfi
     }
 
     return (
-    <>
-        <h1>View Public Profiles</h1>
-        <Search username={userInfo.username} masterPrefList={masterPrefList} masterInterestsList={masterInterestsList} update={setPosts}/>
+    <div className='posts-body'>
+        <div className='posts-title'>View Public Profiles</div>
+        <hr className='posts-horizontal-bar'/>
+        <div className='posts-search'>
+            <Search username={userInfo.username} masterPrefList={masterPrefList} masterInterestsList={masterInterestsList} update={setPosts}/>
+        </div>
         {renderPosts(posts, (username) => handleProfileRedirect(username))}
-    </>);
+
+    </div>);
 };
  
 export default Posts;
