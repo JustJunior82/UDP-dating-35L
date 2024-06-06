@@ -164,10 +164,10 @@ const preferenceSelection = (props) => {
         let list = [];
         for (const [key, value] of Object.entries(props.masterPrefList)) {
             list.push(<div key={key}>
-                <h5>{key}</h5>
+                <h7>{key}</h7>
                 {value.map((item, index) => (
                 <div key={index}>
-                    <input type="checkbox" name={item} value={item} onChange={(event) => handlePreferencesChange(event, key)}/>
+                    <input type="checkbox" name={item} value={item} onChange={(event) => handlePreferencesChange(event, key)}/> {" "}
                     <label>{item}</label><br/>
                 </div>))}
             </div>);
@@ -180,20 +180,38 @@ const preferenceSelection = (props) => {
     }
 
     return (
-        <>
-            <h1>What things are you interested in (We'll use these to help match you with others)</h1>
-            <form onSubmit={props.handleSubmitPreferences}>
-                <h3>Interests:</h3>
-                {props.masterInterestsList.map((item, index) => (
-                <div key={index}>
-                    <input type="checkbox" name={item} value={item} onChange={handleInterestsChange}/>
-                    <label>{item}</label><br/>
-                </div>))}
-                <h3>Preferences:</h3>
-                {prefsList()}
-                <button type="submit">Finish Profile Creation</button>
-            </form>
-        </>
+        <div className='preferences'>
+            <>
+                <div className='preferences-title'>
+                    What are you interested in?
+                </div>
+                <div className='preferences-subtitle'>
+                    We'll use these to help match you with others
+                </div>
+                <form onSubmit={props.handleSubmitPreferences}>
+                    <div className='interests-box'>
+                        <div className='interests-box-title'>
+                            Interests
+                        </div>
+                    {props.masterInterestsList.map((item, index) => (
+                    <div key={index}>
+                        <input type="checkbox" name={item} value={item} onChange={handleInterestsChange}/> {" "}
+                        <label>{item}</label><br/>
+                    </div>))}
+                    </div>
+                    <div className='preferences-box'>
+                        <div className='pref-box-title'>
+                            Preferences
+                        </div>
+                    {prefsList()}
+                    </div>
+                    <div className='finish-button'>
+                        <button type="submit">Finish Profile Creation</button>
+                    </div>
+                </form>
+            </>
+        </div>
+
     );
 }
 

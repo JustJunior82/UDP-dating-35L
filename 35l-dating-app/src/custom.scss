@@ -567,3 +567,74 @@ body {
         transform: translateX(5px) translateY(2px);
     }
 }
+
+.preferences {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 91.4vh;
+    width: 100vw;
+    background-color: #212121;
+    color: white;
+}
+
+.preferences-title {
+    width: 40%;
+    font-size: 2vw;
+    text-align: center;
+    background-color: #d3d3d3;
+    color: black;
+    font-weight: bolder;
+}
+
+.preferences-subtitle {
+    background-color: black;
+    color: white;
+    width: 40%;
+    padding: 2px 2px;
+    display: flex;
+    justify-content: center;
+}
+
+.interests-box-title {
+    font-size: 1.5vw;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.pref-box-title {
+    font-size: 1.5vw;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.interests-box {
+    display: flex;
+    width: 38vw;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.finish-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    button {
+        width: 35%;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50px;
+        background-color: black;
+        color: white;
+    } 
+}
