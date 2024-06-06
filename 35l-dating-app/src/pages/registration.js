@@ -6,77 +6,127 @@ import createUser from "../components/API/createUser";
 import requestLogin from "../components/API/requestLogin";
 import postProfile from "../components/API/postProfile";
 
+import { FaLock } from "react-icons/fa";
+import { FaUser } from "react-icons/fa6";
+import { IoMail } from "react-icons/io5";
+
 const baseRegistration = (props) => {
     return(
-        <>
-            <h1>Welcome to UDP Dating App</h1>
-            <h2>Create your account below:</h2>
-            <h3>I already have an account</h3>
-            <button onClick={() => props.navigate("/login")}>Login Page</button> 
-            <br/>
-            <br/>
-            <br/>
-            <form onSubmit={props.handleRegistration}>
-                <label>
-                    Email:
-                    <input type="email" onChange={props.handleEmailChange} />
-                </label>
-                <br/>
-                <label>
-                    Username:
-                    <input type="text" onChange={props.handleUsernameChange} />
-                </label>
-                <br/>
-                <label>
-                    Password:
-                    <input type="password" onChange={props.handlePasswordChange} />
-                </label>
-                <button type="submit">Register</button>
-            </form>
-        </>
+        <div className='register-body'>
+            <div className='register'>
+                <>
+                    <div className='register-title'>
+                        Welcome to UDP Dating App!
+                    </div>
+                    <div className="register-subtitle">
+                        Register below:
+                    </div>
+                    {/* <button onClick={() => props.navigate("/login")}>Login Page</button>  */}
+                    <div className='register-form'>
+                        <form onSubmit={props.handleRegistration}>
+                            <div className='register-content'>
+                                <span className='icon'>
+                                    <IoMail />
+                                </span>
+                                <div className="register-input-box">
+                                <label>
+                                    <input type="email" onChange={props.handleEmailChange} placeholder='Email'/>
+                                </label>
+                                </div>
+                            </div>
+                            <div className='register-content'>
+                                    <span className='icon'>
+                                        <FaUser /> 
+                                    </span> 
+                                <div className="register-input-box">
+                                <label>
+                                    <input type="text" onChange={props.handleUsernameChange} placeholder='Username'/>
+                                </label>
+                                </div>
+                            </div>
+                            <div className='register-content'>
+                                <span className='icon'>
+                                    <FaLock /> 
+                                </span>
+                                <div className="register-input-box">
+                                <label>
+                                    <input type="password" onChange={props.handlePasswordChange} placeholder='Password'/>
+                                </label>
+                                </div>
+                            </div>
+                            <div className='register-button'>
+                                <button type="submit">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div className='register-nav'>
+                        Already have an account?&nbsp;
+                        <div className='register-login-link' onClick={() => props.navigate('/login')}>Login here.</div>
+                    </div>
+                </>
+            </div>
+        </div>
+        
     );
 }
 
 const profileCreation = (props) => {
     return (
-        <>
-            <h1>Create your Profile</h1>
-            <br/>
-            <form onSubmit={props.handleProfileCreation}>
-                <h2>Full Name</h2>
-                <label>
-                    <input type="text" onChange={props.handleNameChange} />
-                </label>
-                <h2>Where do you Live? (optional)</h2>
-                <label>
-                    Country:
-                    <input type="text" onChange={props.handleCountryChange} />
-                </label>
-                <label>
-                    State:
-                    <input type="text" onChange={props.handleStateChange} />
-                </label>
-                <h2>What is your Birthday?</h2>
-                <label>
-                    Birthday:
-                    <input type="date" onChange={props.handleBirthdayChange} />
-                </label>
-                <br/>
-                <label>
-                    About Me:
+        <div className='profile-creation'>
+            <>
+                <div className='create-profile-title'>
+                    Create your Profile
+                </div>
+                <div className='create-profile-subtitle'>
+                    <span className='required-asterisk'>*</span> are required fields
+                </div>
+                <div className='create-profile-form'>
+                <form onSubmit={props.handleProfileCreation}>
+                    <div className='double-box'>
+                        <div className='profile-input-box'>
+                            <h2>Full Name<span className='required-asterisk'>*</span></h2>
+                            <label>
+                                <input type="text" onChange={props.handleNameChange} />
+                            </label>
+                        </div>
+                        <div className='profile-input-box'>
+                            <h2>Birthday<span className='required-asterisk'>*</span></h2>
+                            <label>
+                                <input type="date" onChange={props.handleBirthdayChange} />
+                            </label>
+                        </div>
+                    </div>
+                    <div className='second-double-box'>
+                        <div className='profile-input-box'>
+                        <h2>Where do you Live?</h2>
+                        <label>
+                            <input type="text" onChange={props.handleCountryChange} placeholder='Country'/>
+                        </label>
+                        </div>
+                        <div className='profile-input-box'>
+                        <label>
+                            <input type="text" onChange={props.handleStateChange} placeholder='State'/>
+                        </label>
+                        </div>
+                    </div>
+                    <label>
+                        <h2>About Me:<span className='required-asterisk'>*</span></h2>
+                        <textarea onChange={props.handleBioChange} rows="4" cols="100"></textarea>
+                    </label>
                     <br/>
-                    <textarea onChange={props.handleBioChange} rows="4" cols="100"></textarea>
-                </label>
-                <br/>
-                <label>
-                    Private Profile (selecting this option will restrict certain users from viewing your profile):
-                    <input type="checkbox" value={!props.publicProfile} onChange={props.handlePublicProfileChange}/>
-                </label>
-                <br/>
-                <button type="submit">Next</button>
-            </form>
-            <br/>
-        </>
+                    <div className='profile-privacy'>
+                        <label>
+                            Private Profile (selecting this option will restrict certain users from viewing your profile):
+                            <input type="checkbox" value={!props.publicProfile} onChange={props.handlePublicProfileChange}/>
+                        </label>
+                    </div>
+                    <div className='next-button'>
+                        <button type="submit">Next</button>
+                    </div>
+                </form>
+                </div>
+            </>
+        </div>
     );
 }
 
@@ -114,10 +164,10 @@ const preferenceSelection = (props) => {
         let list = [];
         for (const [key, value] of Object.entries(props.masterPrefList)) {
             list.push(<div key={key}>
-                <h5>{key}</h5>
+                <h7>{key}</h7>
                 {value.map((item, index) => (
                 <div key={index}>
-                    <input type="checkbox" name={item} value={item} onChange={(event) => handlePreferencesChange(event, key)}/>
+                    <input type="checkbox" name={item} value={item} onChange={(event) => handlePreferencesChange(event, key)}/> {" "}
                     <label>{item}</label><br/>
                 </div>))}
             </div>);
@@ -130,20 +180,38 @@ const preferenceSelection = (props) => {
     }
 
     return (
-        <>
-            <h1>What things are you interested in (We'll use these to help match you with others)</h1>
-            <form onSubmit={props.handleSubmitPreferences}>
-                <h3>Interests:</h3>
-                {props.masterInterestsList.map((item, index) => (
-                <div key={index}>
-                    <input type="checkbox" name={item} value={item} onChange={handleInterestsChange}/>
-                    <label>{item}</label><br/>
-                </div>))}
-                <h3>Preferences:</h3>
-                {prefsList()}
-                <button type="submit">Finish Profile Creation</button>
-            </form>
-        </>
+        <div className='preferences'>
+            <>
+                <div className='preferences-title'>
+                    What are you interested in?
+                </div>
+                <div className='preferences-subtitle'>
+                    We'll use these to help match you with others
+                </div>
+                <form onSubmit={props.handleSubmitPreferences}>
+                    <div className='interests-box'>
+                        <div className='interests-box-title'>
+                            Interests
+                        </div>
+                    {props.masterInterestsList.map((item, index) => (
+                    <div key={index}>
+                        <input type="checkbox" name={item} value={item} onChange={handleInterestsChange}/> {" "}
+                        <label>{item}</label><br/>
+                    </div>))}
+                    </div>
+                    <div className='preferences-box'>
+                        <div className='pref-box-title'>
+                            Preferences
+                        </div>
+                    {prefsList()}
+                    </div>
+                    <div className='finish-button'>
+                        <button type="submit">Finish Profile Creation</button>
+                    </div>
+                </form>
+            </>
+        </div>
+
     );
 }
 
