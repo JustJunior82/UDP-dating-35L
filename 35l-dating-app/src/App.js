@@ -58,6 +58,7 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/posts" element={<Posts userInfo={userInfo}
                     masterPrefList={masterPrefList}
+                    masterInterestsList={masterInterestsList}
                     setVisitingProfile={setVisitingProfile}
                     setVisitingUsername={setVisitingUsername}/>} />
                 <Route path="/login" element={<Login userInfo={userInfo} setUserInfo={setUserInfo} setLogin={(props) => handleLogin(props)}/>} />
