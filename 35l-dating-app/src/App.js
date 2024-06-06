@@ -19,6 +19,7 @@ import Profile from "./pages/profile";
 import Settings from "./pages/settings";
 import Registration from "./pages/registration";
 import Messages from "./pages/messages";
+import Matching from "./pages/matching";
 
 import ChatPage from "./pages/ChatPage";
 
@@ -77,6 +78,7 @@ function App() {
                     masterInterestsList={masterInterestsList}/>} />
                 <Route path="/messages" element={<Messages userInfo={userInfo} 
                     setCurrMessage={(username) => setUserInfo({...userInfo, message: username})}/>} />
+                <Route path="/matching" element={<Matching userInfo={userInfo} />} />
                 {/* hidden page only accessible when registering */}
                 <Route path="/registration" element={<Registration userInfo={userInfo} 
                     setLogin={(props) => handleLogin(props)}

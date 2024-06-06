@@ -226,7 +226,9 @@ async def search_potential_matches(username: str, access_token: str, skip: int =
     # find chunk of matches with varying goodness and use match filter
     result = []
     matches = mongo_client["UDPDating"]["Matches"]
-    for them in users.find(match_filter, skip=skip, limit=limit):
+    for them in users.find(match_filter, skip=skip, limit=mongo.get_search_limit()):
+        if len(result) >= limit:
+            break
         # cannot match oneself
         if them["user"] == me["user"]:
             continue
@@ -238,13 +240,13 @@ async def search_potential_matches(username: str, access_token: str, skip: int =
         if existing_match is not None and not existing_match["success"]:
             continue
 
-        result.append(them["user"])
+        result.append((mongo.get_match_score(me["user"], them["user"]), them["user"]))
 
     # sort by score in descending order (best match first)
-    result.sort(key=lambda item: mongo.get_match_score(me["user"], item), reverse=True)
+    result.sort(reverse=True)
 
     # return the actual number of results and the results
-    return JSONResponse({"error": SUCCESS, "content": {"count": len(result), "matches": result}})
+    return JSONResponse({"error": SUCCESS, "content": {"count": len(result), "matches": [item[1] for item in result]}})
 
 @app.post("/api/resolve_potential_match")
 async def resolve_potential_match(username: str, access_token: str, to: str, success: bool) -> JSONResponse:
@@ -349,15 +351,7 @@ async def get_out_matches(username: str, access_token: str) -> JSONResponse:
     return JSONResponse({"error": SUCCESS, "content": {"count": len(out_matches), "out_matches": list(out_matches)}})
     
 @app.get("/api/get_profile_image")
-async def get_profile_image(username: str, access_token: str) -> JSONResponse:
-    if (auth := mongo.validate_token_internal(username, access_token)) != mongo.InternalErrorCode.SUCCESS:
-        match auth:
-            case mongo.InternalErrorCode.INVALID_LOGIN:
-                return JSONResponse({"error": INVALID_LOGIN}, status_code=401)
-            case mongo.InternalErrorCode.SESSION_TIMED_OUT:
-                return JSONResponse({"error": SESSION_TIMED_OUT}, status_code=401)
-            case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
-                return JSONResponse({"error": FAILED_MONGODB_ACTION})
+async def get_profile_image(username: str) -> JSONResponse:
     mongo_client = mongo.get_mongo_client()
     users = mongo_client["UDPDating"]["Users"]
     me = users.find_one({"user": username})

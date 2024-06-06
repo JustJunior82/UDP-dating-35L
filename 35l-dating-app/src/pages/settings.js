@@ -125,7 +125,6 @@ function Settings({ userInfo, setUserInfo, masterPrefList, masterInterestsList }
     React.useEffect(() => {
         let getProfileImageUrl = new URL('http://localhost:12345/api/get_profile_image');
         getProfileImageUrl.searchParams.append("username", username);
-        getProfileImageUrl.searchParams.append("access_token", accessToken);
         fetch(getProfileImageUrl.toString()).then(
             (response) => {
                 if (response.status !== 200) {
