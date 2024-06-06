@@ -7,6 +7,11 @@ import getPotentialMatches from "../components/API/getPotentialMatches";
 import getMatches from "../components/API/getMatches";
 import getOutMatches from "../components/API/getOutMatches";
 
+import { FaUser } from "react-icons/fa6";
+import { BsCalendarDateFill } from "react-icons/bs";
+import { FaBirthdayCake } from "react-icons/fa";
+import { GoDotFill } from "react-icons/go";
+
 async function get_profile_data(username) {
     let profileUrl = new URL('http://localhost:12345/api/get_profile');
     profileUrl.searchParams.append("username", username);
@@ -133,19 +138,32 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     const VisitingHeader = () => {
         if (!isLoggedIn) {
             return(<>
-                <button onClick={() => {setVisitingProfile(false); setLoading(true); navigate("/posts")}}>Back to Posts</button>
-                <h1>Username: {visitingUsername}</h1>
+                {/* <button onClick={() => {setVisitingProfile(false); setLoading(true); navigate("/posts")}}>Back to Posts</button> */}
+                <div className='username'><span className='profile-user-icon'><FaUser /></span> {visitingUsername}</div>
             </>);
         }
         else if (visitingProfile && isLoggedIn) {
             return (
             <>
-                <button onClick={() => {setVisitingProfile(false); setLoading(true);}}>Back to my Profile</button>
-                <h1> Username: {visitingUsername}</h1>
+                {/* <button onClick={() => {setVisitingProfile(false); setLoading(true);}}>Back to my Profile</button> */}
+                <div className='username'><span className='profile-user-icon'><FaUser /></span> {visitingUsername}</div>
             </>);
         }
         else {
-            return( <h1>Username: {userInfo.username}</h1>)
+            return(<div className='username'><span className='profile-user-icon'><FaUser /></span> {userInfo.username}</div>)
+        }
+    }
+
+    const VisitingButton = () => {
+        if (!isLoggedIn) {
+            return(<>
+                <button onClick={() => {setVisitingProfile(false); setLoading(true); navigate("/posts")}}>Back to Posts</button>
+            </>);   
+        }
+        else if (visitingProfile && isLoggedIn) {
+            return (
+                <button onClick={() => {setVisitingProfile(false); setLoading(true);}}>Back to my Profile</button>
+            );
         }
     }
 
@@ -172,19 +190,32 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         })
     }
 
-    function followButton(isMatc) {
+    function followButton(isMatch) {
         console.log("rerender follow button ", isMatch);
         if (!visitingProfile) {
             return;
         }
         if (outMatches.includes(visitingUsername)) {
-            return (<button>Match Request Pending</button>);
+            return (
+                <div className='pending-button'>
+                    <button>Match Request Pending</button>
+                </div>
+            );
         }
         else if (!isMatch) {
-            return (<button onClick={() => handleMatch(visitingUsername, true)}>Match</button>);
+            return (
+                <div className='match-button'>
+                    <button onClick={() => handleMatch(visitingUsername, true)}>Match</button>
+                </div>
+                
+            );
         }
         else {
-            return (<button>Matched</button>);
+            return (
+                <div className='matched-button'>
+                    <button>Matched</button>
+                </div>
+            );
         }
     }
 
@@ -197,19 +228,25 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             if (!isLoggedIn) {
                 return;
             }
-            return (<button onClick={() => handleMessageRedirect(item)}>Message</button>);
+            return (<button onClick={() => handleMessageRedirect(item)}>Messages</button>);
         }
         if (matches.length !== 0) {
-            return(<>
-                <h3>My Matches</h3>
+            return(<div className='profile-matches-body'>
+               
+                <h3 className='profile-text'>My Matches</h3>
                 {matches.map((item, index) => (
-                    <li key={index}>
-                    -------------------------
-                    <br/>
-                    <button onClick={() => handleProfileRedirect(item)}>{item}</button>
-                    <br/>
-                    <MessageButton item={item}/>
-                    </li>))}</>);
+                    <div key={index}>
+                    <div className='profile-text'>
+                        <div className='matched-user' onClick={() => handleProfileRedirect(item)}>{item}</div>
+                        {index < matches.length - 1 && <span className='between-icon'><GoDotFill /></span>} 
+                    </div>
+                    
+                    <div className='messages-button'>
+                        <MessageButton item={item}/>
+                    </div>
+            </div>
+        ))}</div>
+    );
         }
         else {
             return(<>
@@ -223,12 +260,12 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         if (!("preferences" in profileData)) {
             if (visitingProfile) {
                 return (<>
-                    <h3>My Preferences:</h3><ul><li key="none">None</li></ul>
+                    <h3>&emsp;My Preferences:</h3><ul><li key="none">None</li></ul>
                 </>);
             }
             else {
                 return (<>
-                    <h3>My Preferences:</h3><ul><li key="none">Add to your preferences list on the Settings page</li></ul>
+                    <h3>&emsp;My Preferences:</h3><ul><li key="none">Add to your preferences list on the Settings page</li></ul>
                 </>);
             }
         }
@@ -252,7 +289,7 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
         return (
             <>
-            <h3>My Preferences:</h3>
+            <h3>&emsp;My Preferences:</h3>
             <ul>
                 <h4>ide:</h4>
                 {ide}
@@ -268,19 +305,22 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         if (!("interests" in profileData)) {
             if (visitingProfile) {
                 return (<>
-                    <h3>My Interests:</h3>
+                    <br/>
+                    <h3>&emsp;My Interests:</h3>
                     <ul> <li key="none">None</li></ul>
                 </>);
             }
             else {
                 return (<>
-                    <h3>My Interests:</h3>
+                    <br/>
+                    <h3>&emsp;My Interests:</h3>
                     <ul><li key="none">Add to your interests list on the Settings page</li></ul>
                 </>)
             }
         }
         return (<>
-            <h3>My Interests:</h3>
+            <br/>
+            <h3>&emsp;My Interests:</h3>
             <ul>{profileData.interests.split(",").map((item, index) => (<li key={index}>{item}</li>))}</ul>
             </>);
     }
@@ -292,11 +332,26 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         else {
             return(
                 <>
-                    <h3>Birthday: {profileData.birthday}</h3>
-                    <h3>About Me: {profileData.bio}</h3>
-                    <InterestsList/>
-                    <PrefsList/>
-                    <MatchesList/>
+                    <div className='profile-birthday'>
+                        <span style={{marginRight: '5px'}}><FaBirthdayCake /></span>
+                        Birthday: {profileData.birthday}
+                    </div>
+                    <div className='profile-aboutme'>
+                        About Me: 
+                            <div className='profile-bio'>
+                                <div>
+                                    {`\t${profileData.bio}`}
+                                </div>
+                            </div>
+                        <div className='profile-matches'>
+                            <MatchesList/>
+                        </div>      
+                    </div>
+                    <div className='interests-and-preferences'>
+                        <InterestsList/>
+                        <PrefsList/>
+                    </div>
+                    
                 </>);
         }
     }
@@ -323,12 +378,28 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     else {
         // allow everyone to see username, and join date
         return(
-            <> 
-                <VisitingHeader/>
+            <div>
+                <div className='visiting-button'>
+                    <VisitingButton/>
+                </div>
+            <div className='profile-body'>
+                        <div className='user-card'>
+                            <VisitingHeader/>
+                            <br/>
+                            <div className='user-dates'>
+                                <span style={{marginRight: '10px'}}><BsCalendarDateFill /></span>{" "}Join Date: {profileData.joinDate}
+                            </div>
+                        </div>
+                <div className='profile-body-left'>
+
+                </div>
+                <div className='profile-body-right'>
+                    <PrivatePortion/>
+                </div>
                 {followButton(isMatch)}
-                <h3>Joined: {profileData.joinDate}</h3>
-                <PrivatePortion/>
-            </>);
+            </div>
+            </div>
+        );
     }
 };
  

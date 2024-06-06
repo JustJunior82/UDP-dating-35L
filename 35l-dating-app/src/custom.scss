@@ -646,3 +646,248 @@ body {
         color: white;
     } 
 }
+
+.profile-body {
+    background: #5C7C89;
+    color: white;
+    width: 100%;
+    height: 91.4vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+}
+
+.profile-body-left {
+    width: 25.5vw;
+    height: 73.4vh;
+    background-color: #1F4959;
+    float: left;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.profile-body-right {
+    width: 75.5vw;
+    height: 73.4vh;
+    background-color: #011425;
+    float: right;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding-left: 20px;
+    display: flex;
+}
+
+
+.user-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: spawn-between;
+    align-items: center;
+    color: white;
+    font-size: 2vw;
+    background-color: #212121;
+    width: 20vw;
+    height: 12.5vw;
+    border-radius: 25px;
+    overflow: hidden;
+    padding: 50px 50px;
+    transform: translateY(50px) translateX(50px);
+    z-index: 999;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.8);
+}
+
+.user-dates {
+    display: flex;
+    font-size: 1vw;
+    flex-direction: row;
+    align-items: center;
+    background-color: #212121;
+    color: white;
+}
+
+.profile-birthday {
+    color: black;
+    width: 20%;
+    margin-top: -30px;
+    margin-bottom: 15px;
+    margin-left: -35px;
+    // margin-left: 125px;
+}
+
+.profile-aboutme {
+    font-size: 1.5vw;
+    width: 95%;
+    margin-left: -220px;
+    margin-top: 20px;
+}
+
+.profile-bio {
+    font-size: .8vw;
+}
+
+.interests-and-preferences {
+    background-color: #1F4959;
+    width: 25.5vw;
+    margin-left: -430px;
+}
+
+.profile-matches-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    margin-top: 400px;
+    margin-right: 50px;
+    padding-left: 25px;
+    padding-top: 10px;
+    width: 70%;
+    background-color: #242424;
+    transform: translateX(-44px) translateY(35px);
+}
+
+.profile-matches {
+    display: flex;
+    flex-direction: row;
+    width: 72.3vw;
+    height: 18.3vh;
+
+    button {
+        font-size: 1vw;
+    }
+}
+
+.matched-user {
+    text-decoration: underline;
+    cursor: pointer;
+    color: lightblue;
+    display: flex;
+    flex-direction: row;
+    font-size: 1vw;
+    line-height: 1vw;
+    align-items: center;
+
+    &:hover {
+        font-weight: bold;
+        color: blue;
+    }
+}
+
+.messages-button {
+    transform: translateX(-335px) translateY(0px);
+
+    button {
+        width: 15%;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50px;
+        background-color: black;
+        color: white;
+        padding: 5px 5px;
+    }
+}
+
+.matched-button {
+    transform: translateX(-180px) translateY(265px);
+
+    z-index: 999;
+    button {
+        width: 100%;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50px;
+        background-color: #C3E4E9;
+        color: black;
+        font-weight: bold;
+        padding: 5px 5px;
+    }
+}
+
+.pending-button {
+    transform: translateX(-265px) translateY(265px);
+
+    z-index: 999;
+    button {
+        width: 125%;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50px;
+        background-color: #C3E4E9;
+        color: black;
+        font-weight: bold;
+        padding: 5px 5px;
+    }
+}
+
+.return-button {
+    transform: translateX(-50px) translateY(-50px);
+
+    z-index: 999;
+    button {
+        font-size: 1vw;
+        width: 125%;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50px;
+        background-color: #C3E4E9;
+        color: black;
+        font-weight: bold;
+        padding: 5px 5px;
+    }
+}
+
+.visiting-button {
+    position: absolute;
+    top: 90px; 
+    left: 10px; 
+    z-index: 1000; 
+
+    button {
+        font-size: 1vw;
+        width: 105%;
+        height: 35px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50px;
+        background-color: #C3E4E9;
+        color: black;
+        font-weight: bold;
+        padding: 5px 5px;
+    }
+}
+
+.match-button {
+    transform: translateX(-185px) translateY(265px);
+
+    z-index: 999;
+    button {
+        font-size: 1vw;
+        width: 125%;
+        height: 45px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        border-radius: 50px;
+        background-color: #C3E4E9;
+        color: black;
+        font-weight: bold;
+        padding: 5px 5px;
+    }
+}
