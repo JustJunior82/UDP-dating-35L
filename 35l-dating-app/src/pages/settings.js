@@ -6,6 +6,8 @@ import "../App.css"; // for the ascii styling
 import {useState} from "react";
 // import {useNavigate} from "react-router-dom";
 
+import '../custom.scss';
+
 import postProfile from "../components/API/postProfile";
 
 function preferenceUpdate(props) {
@@ -59,17 +61,20 @@ function preferenceUpdate(props) {
 
     return (
         <>
-            <h1>What things are you interested in (We'll use these to help match you with others)</h1>
             <form onSubmit={props.handleSubmitPreferences}>
-                <h3>Interests:</h3>
+                <div className='int-subtitle'>Interests:</div>
                 {props.masterInterestsList.map((item, index) => (
                 <div key={index}>
                     <input type="checkbox" name={item} value={item} onChange={handleInterestsChange}/>
                     <label>{item}</label><br/>
                 </div>))}
-                <h3>Preferences:</h3>
+                <br/>
+                <div className='int-subtitle'>Preferences:</div>
                 {prefsList()}
-                <button type="submit">Update Preferences</button>
+                <div className='update-button'>
+                    <button type="submit">Update Preferences</button>
+                </div>
+                <hr className='thick-horizontal-bar' />
             </form>
         </>
     );
@@ -149,12 +154,20 @@ function Settings({ userInfo, setUserInfo, masterPrefList, masterInterestsList }
     );
 
     return (
-        <>
-            <h1>User's Settings</h1>
-            <div>
-                <h2>
-                    ASCII Photo
-                </h2>
+        <div className='settings'>
+            <div className='settings-title'>
+                Settings
+            </div>
+            <hr className='thick-horizontal-bar' />
+            <div classNAme='ascii-conversion'>
+                <span className='settings-subtitle'>
+                    Set ASCII Photo
+                </span>
+                <div className='subtitle-description'>
+                    Upload a photo to be converted to ASCII art.
+                </div>
+                <hr className='horizontal-bar' />
+                <br/>
                 <div>
                     <form encType="multipart/form-data" method="POST" onSubmit={async (event) => {
                             event.preventDefault();
@@ -188,8 +201,13 @@ function Settings({ userInfo, setUserInfo, masterPrefList, masterInterestsList }
                             let content = await selectImage(data);
                             setSelectedImage(content);
                         }} />
-                        <button type="reset" onClick={() => {setSelectedImage(noImage); }}>Remove</button>
-                        <button type="submit">Confirm</button>
+                        <span className='confirm-button'>
+                            <button type="submit">Confirm</button>
+                            </span>
+                        <span className='reset-button'>
+                            <button type="reset" onClick={() => {setSelectedImage(noImage); }}>Remove</button>
+                        </span>
+                        <br/>
                     </form>
                 </div>
                 <div className="profile-image">
@@ -198,7 +216,12 @@ function Settings({ userInfo, setUserInfo, masterPrefList, masterInterestsList }
                     }</pre>
                 </div>
             </div>
-            <h3>Update Preferences</h3>
+            <br/>
+            <span className='settings-subtitle'>Update Preferences</span>
+            <div className='subtitle-description'>
+                Select your interests and preferences
+            </div>
+            <hr className='horizontal-bar' />
             {preferenceUpdate({
                 preferences: preferences,
                 interests: interests,
@@ -208,7 +231,7 @@ function Settings({ userInfo, setUserInfo, masterPrefList, masterInterestsList }
                 setPreferences: setPreferences,
                 handleSubmitPreferences: handleSubmitPreferences
             })}
-        </>
+        </div>
     )
     
 

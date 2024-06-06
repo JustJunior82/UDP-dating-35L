@@ -891,3 +891,80 @@ body {
         padding: 5px 5px;
     }
 }
+
+.settings {
+    box-sizing: border-box;
+    padding-left: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #212121;
+    color: white;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.settings-title {
+    font-weight: bold;
+    font-size: 3vw;
+    padding-left: 0px;
+}
+
+.settings-subtitle {
+    font-size: 2vw;
+    font-weight: bold;
+}
+
+.horizontal-bar {
+    border: 0;
+    height: 2px;
+    background: #fff; 
+    margin: 10px 0; 
+    width: 97%;
+}
+
+.thick-horizontal-bar {
+    border: 0;
+    height: 5px;
+    background: #fff; 
+    margin: 10px 0; 
+    width: 97%;
+}
+
+.int-subtitle {
+    font-size: 1vw;
+    font-weight: bolder;
+    padding: 10px 15px;
+}
+
+.confirm-button {
+    button {
+        border-radius: 20px;
+        padding: 5px 10px;
+        color: white;
+        background-color: black;
+        font-weight: bold;
+    }
+}
+
+.reset-button {
+    button {
+        border-radius: 20px;
+        padding: 5px 10px;
+        color: white;
+        background-color: red;
+        font-weight: bold;
+    }
+}
+
+.update-button {
+    padding: 5px 10px;
+    padding-top: 15px;
+    button {
+        border-radius: 20px;
+        padding: 5px 10px;
+        color: white;
+        background-color: black;
+        font-weight: bold;
+    }
+}
