@@ -7,6 +7,10 @@ import getPotentialMatches from "../components/API/getPotentialMatches";
 import getMatches from "../components/API/getMatches";
 import getOutMatches from "../components/API/getOutMatches";
 
+import parse from 'html-react-parser';
+import Convert from "ansi-to-html";
+import "../App.css"; // for the ascii styling
+
 import { FaUser } from "react-icons/fa6";
 import { BsCalendarDateFill } from "react-icons/bs";
 import { FaBirthdayCake } from "react-icons/fa";
@@ -68,6 +72,43 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     const [profileData, setProfileData] = useState({ preferences: "", friends: ""});
     const [isMatch, setIsMatch] = useState(false);
     const navigate = useNavigate();
+    const noImage = "";
+    const [selectedImage, setSelectedImage] = React.useState(noImage);
+
+    let convert = new Convert({newline: true, escapeXML: true});
+
+    let username = userInfo["username"];
+    let accessToken = userInfo["token"];
+    React.useEffect(() => {
+        let getProfileImageUrl = new URL('http://localhost:12345/api/get_profile_image');
+        getProfileImageUrl.searchParams.append("username", username);
+        getProfileImageUrl.searchParams.append("access_token", accessToken);
+        fetch(getProfileImageUrl.toString()).then(
+            (response) => {
+                if (response.status !== 200) {
+                    // alert("Not logged in!");
+                    navigate("/login");
+                    return {error: 0, image: noImage};
+                }
+                return response.json(); 
+            }
+        ).then(
+            (responseData) => {
+                if (responseData["error"] !== 0) {
+                    alert("Failed to fetch profile image.");
+                    return noImage;
+                }
+                return responseData["content"];
+            }
+        ).then(
+            (image) => {
+                setSelectedImage(image);
+            }
+        ).catch(
+            error => {}
+        )},
+        [navigate, username, accessToken]
+    );
 
     function isPrivate() {
         return(("public" in profileData) && profileData.public === "false");
@@ -151,6 +192,7 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
         }
         else {
             return(<div className='username'><span className='profile-user-icon'><FaUser /></span> {userInfo.username}</div>)
+            
         }
     }
 
@@ -164,6 +206,44 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             return (
                 <button onClick={() => {setVisitingProfile(false); setLoading(true);}}>Back to my Profile</button>
             );
+        }
+    }
+    
+    const ProfilePicture = () => {
+        if (!isLoggedIn) {
+            return (
+                <>
+                    <div className="profile-image">
+                        <pre>{
+                            parse(convert.toHtml(selectedImage))
+                        }</pre>
+                        {/* <div className='pfptext'>Profile Picture</div> */}
+                    </div>  
+                </>
+            )
+        }
+        else if (visitingProfile && isLoggedIn) {
+            return (
+                <>
+                    <div className="profile-image">
+                        <pre>{
+                            parse(convert.toHtml(selectedImage))
+                        }</pre>
+                        {/* <div className='pfptext'>Profile Picture</div> */}
+                    </div>  
+                </>
+            );
+        }
+        else {
+            return (
+                <>
+                        <pre>{
+                            parse(convert.toHtml(selectedImage))
+                        }</pre>
+                        {/* <div className='pfptext'>Profile Picture</div> */}
+                </>
+            );
+            
         }
     }
 
@@ -228,31 +308,33 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             if (!isLoggedIn) {
                 return;
             }
-            return (<button onClick={() => handleMessageRedirect(item)}>Messages</button>);
+            return (<button onClick={() => handleMessageRedirect(item)}>Message</button>);
         }
         if (matches.length !== 0) {
             return(<div className='profile-matches-body'>
                
-                <h3 className='profile-text'>My Matches</h3>
+                <h3 className=''>My Matches</h3>
+                
+                <div className='matches-list'>
                 {matches.map((item, index) => (
                     <div key={index}>
                     <div className='profile-text'>
                         <div className='matched-user' onClick={() => handleProfileRedirect(item)}>{item}</div>
-                        {index < matches.length - 1 && <span className='between-icon'><GoDotFill /></span>} 
+                        <span className='messages-button'>
+                            <MessageButton item={item}/>
+                        </span>
                     </div>
                     
-                    <div className='messages-button'>
-                        <MessageButton item={item}/>
-                    </div>
             </div>
-        ))}</div>
+        ))} </div>
+        </div>
     );
         }
         else {
-            return(<>
+            return(<div className='profile-matches-body'>
                 <h3>My Matches</h3>
                 <p>Go to the Matches page to find some new matches or search by preferenes on the Search Page!</p>
-            </>);
+            </div>);
         }
     }
 
@@ -381,6 +463,9 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
             <div>
                 <div className='visiting-button'>
                     <VisitingButton/>
+                </div>
+                <div className='pfp'>
+                    <ProfilePicture/>
                 </div>
             <div className='profile-body'>
                         <div className='user-card'>
