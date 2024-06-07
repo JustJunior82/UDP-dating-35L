@@ -137,26 +137,34 @@ function Matching ({ userInfo }) {
     }, [loading, currentProfile]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className='loading'>Loading...</div>;
     }
     if (currentProfile === null) {
-        return <div>No more matches.</div>;
+        return <div className='no-matches'>No more matches.</div>;
     }
 
     return (
-        <div>
-            <h1>Reject (ctrl+b)/Accept (ctrl+f)</h1>
-            <div>
-                {currentProfile}
+        <div className='matching-bg'>
+            <div className='matching'>
+                <div>
+                    <span className='reject'>Reject (ctrl+b)</span> <span className='slash'>/</span> <span className='accept'>Accept (ctrl+f)</span>
+                </div>
+                <div className="profile-image matching-pfp">
+                    <pre>{
+                        parse(convert.toHtml(currentImage))
+                    }</pre>
+                </div>
+                <div className='matching-user'>
+                    {currentProfile}
+                </div>
+                <div className='matching-buttons'>
+                    <button onClick={handleReject}>Reject</button>
+                    <button onClick={handleAccept}>Accept</button>
+                </div>
+                
             </div>
-            <div className="profile-image">
-                <pre>{
-                    parse(convert.toHtml(currentImage))
-                }</pre>
-            </div>
-            <button onClick={handleReject}>Reject</button>
-            <button onClick={handleAccept}>Accept</button>
         </div>
+        
     );
 }
 

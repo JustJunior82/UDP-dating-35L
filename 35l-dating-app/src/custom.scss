@@ -1071,3 +1071,110 @@ body {
     box-shadow: 0 0 30px rgba(0, 0, 0, .5);
 }
 
+.no-matches {
+    font-size: 5vw;
+    display: flex;
+    width: 100vw;
+    height: 91.4vh;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: #212121;
+}
+
+.loading {
+    font-size: 4vw;
+    display: flex;
+    width: 100vw;
+    height: 91.4vh;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: #212121;
+}
+
+.reject {
+    font-size: 1.5vw;
+    color: red;
+    font-weight: bold;
+}
+
+.accept {
+    font-size: 1.5vw;
+    color: #65fe08;
+    font-weight: bold;
+}
+
+.slash {
+    font-size: 1.5vw;
+    color: white;
+    font-weight: bold;
+}
+
+.matching {
+    height: 70vh;
+    width: 30vw;
+    color: white;
+    background-color: #212121;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    border-radius: 25px;
+    box-shadow: 0px 0px 20px 10px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+.matching-bg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, red, #37e937);
+    height: 91.4vh;
+    width: 100vw;
+}
+
+.matching-user {
+    font-size: 2vw;
+}
+
+.matching-pfp {
+    font-size: 0.1vw;
+    width: 10vw;
+    height: 20vh;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 25px;
+    margin-top: 50px;
+}
+
+.matching-buttons {
+    padding: 5px 10px;
+    padding-top: 50px;
+    button {
+        border-radius: 20px;
+        padding: 5px 10px;
+        color: white;
+        background-color: black;
+        font-weight: bold;
+        font-size: 2vw;
+        margin: 20px;
+    }
+    button:first-child{
+        background-color: #ff3632;
+        &:hover {
+            background-color: #ff0500;
+            color:white;
+        }
+    }
+    button:last-child{
+        background-color: #198450;
+        &:hover {
+            background-color: #38cb82;
+            color:white;
+        }
+    }
+}
