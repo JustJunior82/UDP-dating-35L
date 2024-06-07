@@ -739,7 +739,7 @@ body {
     flex-direction: column;
     width: 100%;
     height: 100%;
-    margin-top: 400px;
+    margin-top: 350px;
     margin-right: 50px;
     padding-left: 25px;
     padding-top: 10px;
@@ -752,10 +752,25 @@ body {
     display: flex;
     flex-direction: row;
     width: 72.3vw;
-    height: 18.3vh;
+    height: 23.5vh;
 
     button {
         font-size: 1vw;
+    }
+}
+
+.matches-list {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    background-color: #242424;
+    color: white;
+    padding-left: 25px;
+    padding-top: 10px;
+
+    .profile-text {
+        margin-right: 10px;
     }
 }
 
@@ -768,6 +783,7 @@ body {
     font-size: 1vw;
     line-height: 1vw;
     align-items: center;
+    padding-left: 100px;
 
     &:hover {
         font-weight: bold;
@@ -776,16 +792,17 @@ body {
 }
 
 .messages-button {
-    transform: translateX(-335px) translateY(0px);
+    transform: translateX(-500px) translateY(200px);
 
     button {
-        width: 15%;
+        transform: translateX(12.5px) translateY(-32.5px);
+        width: 45%;
         height: 45px;
         display: flex;
         justify-content: center;
         align-items: center;
         background-color: white;
-        border-radius: 50px;
+        border-radius: 10px;
         background-color: black;
         color: white;
         padding: 5px 5px;
@@ -1071,3 +1088,23 @@ body {
     box-shadow: 0 0 30px rgba(0, 0, 0, .5);
 }
 
+.pfp {
+    top: 425px;
+    left: 135px;
+    position: absolute;
+    z-index: 10000;
+    font-size: 0.1vw;
+    width: 10vw;
+    height: 20vh;
+    background-color: #212121;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 25px;
+
+    .pfptext {
+        color: white;
+        font-size: 1vw;
+    }
+}
