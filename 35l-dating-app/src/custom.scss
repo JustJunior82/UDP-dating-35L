@@ -580,6 +580,7 @@ body {
     width: 100vw;
     background-color: #212121;
     color: white;
+    overflow-x: hidden;
 }
 
 .preferences-title {
@@ -633,9 +634,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: #red;
+    margin-left: -50vw;
+    margin-right: -50vw;
 
     button {
-        width: 35%;
+        width: 10%;
         height: 45px;
         display: flex;
         justify-content: center;
