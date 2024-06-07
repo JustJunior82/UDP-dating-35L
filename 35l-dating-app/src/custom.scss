@@ -1101,6 +1101,10 @@ body {
     width: 10vw;
     height: 20vh;
     background-color: #212121;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 .no-matches {
     font-size: 5vw;
@@ -1184,9 +1188,6 @@ body {
         color: white;
         font-size: 1vw;
     }
-}
-
-    margin-top: 50px;
 }
 
 .matching-buttons {
