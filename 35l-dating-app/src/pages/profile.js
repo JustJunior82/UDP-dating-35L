@@ -331,10 +331,10 @@ function Profile ({ userInfo, isLoggedIn, setMessage, visitingProfile, setVisiti
     );
         }
         else {
-            return(<>
+            return(<div className='profile-matches-body'>
                 <h3>My Matches</h3>
                 <p>Go to the Matches page to find some new matches or search by preferenes on the Search Page!</p>
-            </>);
+            </div>);
         }
     }
 
