@@ -1186,6 +1186,13 @@ body {
     border-radius: 25px;
     margin-top: 20px;
     overflow: hidden;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    // Hide scrollbar for Firefox
+    scrollbar-width: none;
+    scrollbar-color: transparent transparent;
 }
 
 .matching-buttons {
