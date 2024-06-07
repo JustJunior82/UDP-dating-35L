@@ -1097,7 +1097,7 @@ body {
     left: 135px;
     position: absolute;
     z-index: 10000;
-    font-size: 0.1vw;
+    font-size: 3px;
     width: 10vw;
     height: 20vh;
     background-color: #212121;
@@ -1175,10 +1175,10 @@ body {
 }
 
 .matching-pfp {
-    font-size: 0.1vw;
-    width: 27.5vw;
-    height: 50vh;
-    background-color: transparent;
+    font-size: 3px;
+    width: 10vw;
+    height: 20vh;
+    background-color: black;
     display: flex;
     flex-direction: column;
     align-items: center;
