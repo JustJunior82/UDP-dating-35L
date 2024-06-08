@@ -4,6 +4,11 @@ UCLA COM SCI 35L project.
 ## IMPORTANT: Setting up .env
 To keep the database secure, .env files will be individually sent to TAs. They should be placed under the root UDP-dating-35L directory at UDP-dating-35L/.env.
 
+## IMPORTANT: uvloop in requirements.txt
+Windows does not support a Python package named `uvloop`. If using a Windows machine, please substitute
+`backend/api/requirements.txt` with `backend/api/requirements-windows.txt`. The quickstart script attempt to do platform
+detection.
+
 ## Quickstart
 To just run the application, a quickstart script has been provided in the project root directory.
 ```sh

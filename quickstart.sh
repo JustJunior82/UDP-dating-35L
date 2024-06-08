@@ -13,7 +13,17 @@ fi
 /usr/bin/env python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
-pip install -r backend/api/requirements.txt
+
+# Attempt to do OS detection.
+if [[ "$OSTYPE" == "cygwin" ]]; then
+    pip install -r backend/api/requirements-windows.txt
+elif [[ "$OSTYPE" == "msys" ]]; then
+    pip install -r backend/api/requirements-windows.txt
+else
+    pip install -r backend/api/requirements.txt
+fi
+
+# Continue installing dependencies
 cd 35l-dating-app
 npm install
 cd ..
