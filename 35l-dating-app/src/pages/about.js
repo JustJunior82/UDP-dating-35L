@@ -25,7 +25,7 @@ const About = () => {
                         As we all know, Professor Eggert has not used a GUI since the 1980s, but it's not like computer science professors are not interested in dating. We are proposing UDP (a recursive acronym that stands for UDP dating protocol), a dating application for computer science professors.
                     </p>
                     <p>
-                        Users must create an account and log in. Profiles are rendered using markdown (effectively, a README.md) and the editor is navigable using a subset of emacs keystrokes. Once authenticated, users can update their profile and fetch potential matches. Profiles contain “pictures,” but rather than standard image data, pictures are stored as ASCII art. Profiles also contain preferences that are used in determining matches. Users can upload standard image data (e.g. png) and convert the picture into ASCII using an in-app converter.
+                        Users must create an account and log in. Once authenticated, users can update their profile and fetch potential matches. Profiles contain “pictures,” but rather than standard image data, pictures are stored as ASCII art. Profiles also contain preferences that are used in determining matches. Users can upload standard image data (png or jpeg) and convert the picture into ASCII using an in-app converter.
                     </p>
                     <p>
                         Once a user creates a profile, all it takes is a click to start matching. You can either look through users who have added you as a potential match or find people by preference. Users can create more complex queries out of simple queries. Like Tinder, you can swipe left or right. Users swipe left by pressing C-b and swipe right by pressing C-f. Profiles that the user swipes right on will be added to your potential matches. Once both users add each other as potential matches, they can message each other. Messages, of course, are all in ASCII encoding.
@@ -53,7 +53,7 @@ const About = () => {
                             <li>“Instant” messaging, users can message potential matches to connect</li>
                             <li>Users can follow other users profiles (potential matches)</li>
                             <li>ASCII profile picture converter: Users can convert profile picture to ASCII art</li>
-                            <li>Vim mode: allows different set of keybinds to navigate through application</li>
+                            <li>Emacs mode: allows different set of keybinds to navigate through matching</li>
                         </ul>
                     </li>
                 </ul>
