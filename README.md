@@ -50,5 +50,13 @@ npm start
 ```
 This will start the frontend on localhost on port 3000 i.e. `http://localhost:3000/`.
 
+## Contributors
+
+The following is a mapping from name to contributor username and email as displayed in `git log`.
+- Zack Sima: `Zack Sima <simayance@gmail.com>`
+- Andrew Wu: `yuchaeqi <137462450+yuchaeqi@users.noreply.github.com>`
+- Eric Wang: `nouturnsign <89937277+nouturnsign@users.noreply.github.com>`
+- Leison Gao: `Leison Gao <leisongao2005@g.ucla.edu>`
+
 ## API Documentation
 See [/backend/README.md](/backend/README.md)
