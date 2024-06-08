@@ -11,7 +11,7 @@ To just run the application, a quickstart script has been provided in the projec
 ```
 
 ## Setup
-To setup the app, dependencies need to be installed.
+To setup the app, dependencies need to be installed. You will need Python 3 and Node.js.
 
 To install backend dependencies, we recommend using a virtual environment (`venv`).
 ```sh
@@ -37,13 +37,13 @@ Assuming you are in the project root directory, to run the app, use the virtual 
 source venv/bin/activate
 python3 backend/api/main.py
 ```
-This will start the backend on localhost on port 12345 supporting HTTP/1.1 i.e. (`http://localhost:12345/`).
+This will start the backend on localhost on port 12345 supporting HTTP/1.1 i.e. `http://localhost:12345/`.
 
 Then change to the `35l-dating-app` directory and start the frontend,
 ```sh
-cd 35l
 npm start
 ```
+This will start the frontend on localhost on port 3000 i.e. `http://localhost:3000/`.
 
 ## API Documentation
 See [/backend/README.md](/backend/README.md)
