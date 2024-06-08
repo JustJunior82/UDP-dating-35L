@@ -68,7 +68,6 @@ Registers a new user.
 **Returns:**
 - A JSON response indicating success or failure (e.g., invalid email, duplicate user or email, failed MongoDB action).
 
-=======
 ## POST /api/login
 
 Login an existing user and get an access token.
@@ -263,7 +262,3 @@ Clears conversation between logged in user and other user. Any user can one-way 
 - `username` (str): The username for the existing user.
 - `access_token` (str): The valid access token for the existing user.
 - `to` (str): username of other user in conversation
-
-## BUILD ##
-
-Given the right dependencies have been installed, putting the working directory in "api" and executing "python3 main.py" should run the server on port 12345.
