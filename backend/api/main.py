@@ -14,7 +14,6 @@ from pydantic import BaseModel
 
 import mongo
 import hasher
-import sanitizer
 
 ############ ERROR CODES ##############
 
@@ -86,8 +85,7 @@ async def post_profile(username: str, access_token: str, profile_key: str, profi
             case mongo.InternalErrorCode.FAILED_MONGODB_ACTION:
                 return JSONResponse({"error": FAILED_MONGODB_ACTION})
     
-    sanitized_profile = sanitizer.sanitize_string(profile)
-    mongo.post_profile(username, profile_key, sanitized_profile)
+    mongo.post_profile(username, profile_key, profile)
     return JSONResponse({"error": SUCCESS})
 
 @app.post("/api/delete_profile_key")
